@@ -7,8 +7,6 @@
 	<title>Test</title>
 
     <script src="libs/phaser.min.js"></script>
-    <script src="main.js"></script>
-    <script src="sprite.js"></script>
     <script src="Boot.js"></script>
     <script src="Preloader.js"></script>
     <script src="StartMenu.js"></script>
@@ -27,11 +25,11 @@
 
     <script type="text/javascript">
         window.onload = function() {
-            var game = new Phaser.Game(1000, 800, Phaser.AUTO, '');
+            var game = new Phaser.Game(750, 500, Phaser.AUTO, '');
             game.state.add('Boot', worldshift.Boot);
             game.state.add('Preloader', worldshift.Preloader);
             game.state.add('StartMenu', worldshift.StartMenu);
-            game.state.add('Game', worldshift.StartMenu);
+            game.state.add('Game', worldshift.Game);
             game.state.start('Boot');
         }
     </script>

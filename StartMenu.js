@@ -9,11 +9,10 @@ worldshift.StartMenu.prototype = {
 
 		this.world.setBounds(0, 0, this.game.width, this.game.height);
 
-		startBG = this.add.image(0, 0, 'forestbg');
-		this.add.image(this.world.centerX, this.world.centerY, 'star');
-
-		this.levelbutton = this.add.button(this.world.centerX - 250, 400, 'button', this.startGame, this);
-		this.levelbutton.anchor.setTo(0.5, 0.5);
+		startBG = this.add.image(0, 0, 'startbg');
+		
+		this.startbutton = this.add.button(this.world.centerX, 400, 'startbutton', this.startGame, this);
+		this.startbutton.anchor.setTo(0.5, 0.5);
 		
 	},
 
