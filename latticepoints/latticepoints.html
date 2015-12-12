@@ -1,0 +1,138 @@
+<html>
+	<head>
+		<title>Camera Examples</title>
+		<style>
+			body {margin: 0px; }
+			canvas { width: 100%; height: 100%;}
+		</style>
+	</head>
+	<body>
+		<script src="lib/three.min.js"></script>
+		<script type="text/javascript" src="dat.gui.min.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/CanvasRenderer.js"></script>
+		<script src="js/Projector.js"></script>
+		<script>
+
+			var gui = new dat.GUI({width: 500});
+
+			var parameters = {
+				equation: "hello",
+				cameras: "One",
+				angle: 45,
+				size: 0.1
+			};
+			//var equation = gui.add(parameters, 'equation');
+			var cameras = gui.add( parameters, 'cameras', ["One", "Two"]).name('Camera');
+
+			cameras.onChange(function(value) {
+				updateGUIScene();
+			});
+
+			function updateGUIScene() {
+				var value = parameters.cameras;
+				if (value == "One") {
+					viewCamera1 = true;
+					viewCamera2 = false;
+					parameters.size = 0.1;
+					particleMaterial.size = parameters.size;
+				}
+				else if (value == "Two") {
+					viewCamera1 = false;
+					viewCamera2 = true;
+					parameters.size = 0.4;
+					particleMaterial.size = parameters.size;
+				}
+
+			}
+
+			var angle = gui.add(parameters, 'angle').min(0).max(90).step(1).name('ANGLE').listen();
+			angle.onChange(function(value) {
+				camera1.lookAt(new THREE.Vector3(Math.cos((Math.PI/180) *parameters.angle),Math.sin((Math.PI/180) *parameters.angle),0));
+				line.geometry.vertices.push(line.geometry.vertices.shift());
+				line.geometry.vertices[num_vertices-1] = new THREE.Vector3(Math.cos((Math.PI/180) *parameters.angle),Math.sin((Math.PI/180) *parameters.angle),0);
+				line.geometry.verticesNeedUpdate = true;
+			});
+
+			var size= gui.add(parameters, 'size').min(.001).max(0.9).step(.001).name('POINT SIZE').listen();
+			size.onChange(function(value) {
+				particleMaterial.size = parameters.size;
+			});
+
+			var scene = new THREE.Scene();
+			var sphere,controls, group, particle, particleMaterial;
+
+			var camera1 = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 10000);
+			camera1.lookAt(new THREE.Vector3(Math.cos((Math.PI/180) *45),Math.sin((Math.PI/180) *45),0));
+			camera1.position.set(0,0,0);
+			var viewCamera1 = true;
+
+			scene.add(camera1);
+
+			var camera2 = new THREE.PerspectiveCamera( 45, window.innerWidth/window.innerHeight, 0.1, 10000);
+			camera2.position.set(32, 18, 45);
+			var viewCamera2 = false;
+
+			scene.add(camera2);
+
+			var cameraHelper = new THREE.CameraHelper( camera1 );
+      		scene.add( cameraHelper );
+
+			var texture = THREE.ImageUtils.loadTexture("ball.png");
+
+			var renderer = new THREE.WebGLRenderer({antialias:true});
+			renderer.autoClear = false;
+
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				document.body.appendChild( renderer.domElement );
+
+				var ambientLight = new THREE.AmbientLight( 0x333333 );
+				scene.add( ambientLight );
+
+				var light = new THREE.DirectionalLight( 0xFFFFFF, 0.5);
+				light.position.set(10, 10, -10);
+				scene.add( light );
+
+				var particles = new THREE.Geometry;
+				for (var i = 0; i < 200; i++) {
+					for (var j = 0; j < 200; j++) {
+					var particle = new THREE.Vector3(i, j, 0);
+					particles.vertices.push(particle);
+					}
+				}
+
+				particleMaterial = new THREE.PointCloudMaterial({ map: texture, size: 0.1, color: 0xffff00, transparency: true, alphaTest: 0.5 });
+				var particleSystem = new THREE.PointCloud(particles, particleMaterial);
+
+				scene.add(particleSystem);
+
+				render();
+
+			}
+
+			function animate() {
+				requestAnimationFrame( animate );
+				// camera.lookAt(new THREE.Vector3(200,0,0));
+			}
+
+			function render() {
+				var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+				if (viewCamera1)
+					renderer.render( scene, camera1);
+				if (viewCamera2)
+					renderer.render( scene, camera2);
+				
+				requestAnimationFrame( render );
+			}
+
+			//--------------------------------------------//
+		</script>
+	</body>
+</html>
