@@ -18,9 +18,9 @@ worldshift.StartMenu.prototype = {
 
 	startGame: function (pointer) {
 		this.state.start('Game');
-	},
-
-	render: function() {
-		this.game.debug.pointer(this.game.input.activePointer);
 	}
+
+	// render: function() {
+	// 	this.game.debug.pointer(this.game.input.activePointer);
+	// }
 };

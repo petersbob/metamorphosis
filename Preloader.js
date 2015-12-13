@@ -14,12 +14,14 @@ worldshift.Preloader.prototype = {
 		this.load.setPreloadSprite(this.preloadBar);
 
 		this.load.image('startbg', 'images/startbg.png');
+		this.load.image('layer1', 'images/Layer1.png');
+
 		this.load.image('startbutton', 'images/startbutton.png');
 		this.load.image('gamebg', 'images/Background1-2.png');
 
-		this.load.spritesheet('')
+		this.load.spritesheet('robot', 'images/ROBOTSPRITES.png', 112.5, 113);
 
-		this.load.spritesheet('sprite', 'images/Chompmansprite.png', 112.73, 160);
+		this.load.spritesheet('chomp', 'images/Chompmansprite.png', 112.73, 160);
 
 	},
 
