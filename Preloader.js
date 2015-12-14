@@ -18,6 +18,7 @@ worldshift.Preloader.prototype = {
 
 		this.load.image('startbutton', 'images/startbutton.png');
 		this.load.image('gamebg', 'images/Background1-2.png');
+		this.load.image('groundplatform', 'images/groundplatform.png');
 		//---body parts----//
 		this.load.image('head', 'images/diamond.png');
 		this.load.image('torso', 'images/firstaid.png');
