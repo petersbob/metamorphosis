@@ -6,7 +6,7 @@ worldshift.Boot = function(game) {};
 worldshift.Boot.prototype = {
 	preload: function() {
 			this.load.image('preloaderBar', 'images/loaderbar.png');
-			this.load.image('preloadbg', 'images/preloadbg.png');
+			this.load.image('preloadbg', 'images/Directions.png');
 	},
 
 	create: function() {

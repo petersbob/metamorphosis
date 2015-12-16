@@ -9,21 +9,31 @@ worldshift.Preloader.prototype = {
 
 		this.add.image(0, 0, 'preloadbg');
 
-		this.preloadBar = this.add.sprite(this.world.centerX, this.world.centerY, 'preloaderBar');
-		this.preloadBar.anchor.setTo(0.5, 0.5);
+		this.preloadBar = this.add.sprite(0, 500, 'preloaderBar');
+		this.preloadBar.anchor.setTo(0, 1);
 		this.load.setPreloadSprite(this.preloadBar);
 
-		this.load.image('startbg', 'images/startbg.png');
-		this.load.image('layer1', 'images/Layer1.png');
-
+		this.load.audio('song', 'Weirdsong.wav');
+		
 		this.load.image('startbutton', 'images/startbutton.png');
-		this.load.image('gamebg', 'images/Background.png');
-		this.load.image('groundplatform', 'images/groundplatform.png');
+		
+		this.load.image('groundplatform', 'images/platforms/groundplatform.png');
+
+		//-----------backgrounds----------//
+		this.load.image('conbg', 'images/backgrounds/conbackground.png');
+		this.load.image('startmenubg', 'images/backgrounds/startbg.png');
+		// this.load.image('2ndbg', 'images/backgrounds/2ndbg.png');
+		// this.load.image('3rdbg', 'images/backgrounds/3rdbg.png');
+		// this.load.image('4thbg', 'images/backgrounds/4thbg.png');
+		// this.load.image('5thbg', 'images/backgrounds/5thbg.png');
+
+		// this.load.image('layer', 'images/backgrounds/layer1stkill.png');
+
+		//------------------------------------//
+
+		this.load.image('platform', 'images/platforms/Platform3-3.png');
 		//---body parts----//
-		this.load.image('head', 'images/diamond.png');
-		this.load.image('torso', 'images/firstaid.png');
-		this.load.image('arms', 'images/star.png');
-		this.load.image('legs', 'images/explosion.png');
+		this.load.spritesheet('item', 'images/Items.png', 72, 72);
 		//------------------//
 
 		//---------------spritesheets---------------//
@@ -43,6 +53,8 @@ worldshift.Preloader.prototype = {
 		this.load.spritesheet('ccrc', 'images/playersprites/ccrc.png', 110.21, 151);
 		this.load.spritesheet('cccr', 'images/playersprites/cccr.png', 110.36, 135);
 		this.load.spritesheet('cccc', 'images/playersprites/cccc.png', 112.73, 154);
+
+		this.load.spritesheet('friend', 'images/playersprites/Friend.png', 150, 250);
 		//------------------------------------------//
 
 	},
@@ -52,16 +64,16 @@ worldshift.Preloader.prototype = {
 	},
 
 	update: function () {
-		// if(this.cache.isSoundDecoded('journey') && this.ready == false) {
-  //           this.ready = true;
-  //           this.bgmusic = this.add.audio('journey')
-  //           this.bgmusic.play('', 0, 1, true, true); 
-  //           //--looping not working in chrome--//
-  //           this.bgmusic.onLoop.add(this.playBGMusic, this);
+		if(this.cache.isSoundDecoded('song') && this.ready == false) {
+            this.ready = true;
+            this.bgmusic = this.add.audio('song')
+            this.bgmusic.play('', 0, 1, true, true); 
+            //--looping not working in chrome--//
+            this.bgmusic.onLoop.add(this.playBGMusic, this);
             
             this.state.start('StartMenu');
 
-        //}
+        }
 	},
     playBGMusic: function() {
         this.bgmusic.play('', 0, 1, true);

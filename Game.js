@@ -3,6 +3,13 @@ worldshift.Game = function(game) {
 
 };
 
+var stage = 1;
+var friendwalk = false;
+
+var posx = [249, 998, 1326, 1773, 3120, 3107,3124, 104, 443, 1750, 97, 514, 620, 679, 768, 906, 612, 814, 1136, 1255, 1672, 2014, 2551, 2868, 3149, 3563, 3288, 2835, 3132, 3295, 3493, 3224, 34991]
+var posy = [318, 639, 758, 895, 933, 1279, 1226, 1176, 1611, 1531, 2266, 2486, 2372, 2326, 2273, 2153, 2631, 2965, 3266, 3410, 3600, 2842, 2598, 1959, 2155, 2377, 2733, 2892, 3023, 3244, 3497, 1584, 3501]
+var rscale = [4, 2, 2, 7, 5, 1, 2, 4, 5, 4, 3, 1, 1, 1, 2, 3, 4, 3, 5, 4, 4, 5, 5, 8, 3, 4, 2, 6, 2, 7, 4]
+
 var spriteparts = {
       "head": false,
       "torso": false,
@@ -19,19 +26,33 @@ worldshift.Game.prototype = {
 	create: function() {
 		this.world.setBounds(0, 0, 3750, 3750);
 
-		this.bg = this.add.image(0, 0, 'gamebg');
+		
 		
 		this.physics.startSystem(Phaser.Physics.ARCADE);
 
-		this.buildsprites();
-
 		this.platforms = this.add.group();
-		this.groundplatform = this.platforms.create(0, 3694, 'groundplatform');
+		this.groundplatform = this.platforms.create(0, 3730, 'groundplatform');
 		this.groundplatform.scale.setTo(47, 1);
-		this.physics.enable(this.platforms, Phaser.Physics.ARCADE);
+		this.physics.enable(this.groundplatform, Phaser.Physics.ARCADE);
 		this.groundplatform.body.immovable = true;
 
-		//this.layer = this.add.image(0, 0, 'layer1');
+		
+
+		for (var i = 0; i < 31; i++) {
+			this.rock = this.platforms.create(posx[i], posy[i], 'groundplatform');
+			this.rock.scale.setTo(rscale[i]);
+			this.physics.enable(this.rock, Phaser.Physics.ARCADE);
+			this.rock.body.immovable = true;
+		}
+
+		this.rock = this.platforms.create(3321, 1500, 'groundplatform');
+		this.rock.scale.setTo(rscale[i]);
+		this.physics.enable(this.rock, Phaser.Physics.ARCADE);
+		this.rock.body.immovable = true;
+
+		this.add.sprite(0, 0, 'conbg');
+
+		this.buildsprites();
 
 		this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -39,7 +60,7 @@ worldshift.Game.prototype = {
 
 	buildsprites: function() {
         //----Character---//
-        this.sprite = this.add.sprite(0, 3500, 'rrrr');
+        this.sprite = this.add.sprite(1922, 1426, 'rrrr');
         this.sprite.anchor.x = 0;
         this.sprite.anchor.y = 1;
 
@@ -64,30 +85,43 @@ worldshift.Game.prototype = {
 		this.physics.enable(this.sprite, Phaser.Physics.ARCADE);
 		this.sprite.body.collideWorldBounds = true;
 		this.sprite.body.bounce.y = 0.2;
-		this.sprite.body.gravity.y = 200;
+		this.sprite.body.gravity.y = 400;
+
+		this.friend = this.add.sprite(2042, 1239, 'friend');
+		this.friend.animations.add('winner', [0, 1, 2, 1], 5, true);
+		this.friend.animations.add('sit', [5, 6], 5, true);
+		this.physics.enable(this.friend, Phaser.Physics.ARCADE);
+		this.friend.body.collideWorldBounds = false;
+		this.friend.body.bounce.y = 0.2;
+		this.friend.body.gravity.y = 400;
 		//-------------------//
 
 		//------------body parts-------//
 		this.bodyparts = this.add.group();
-		this.head = this.bodyparts.create(300, 3500, 'head');
+		this.head = this.bodyparts.create(30, 3513, 'item');
 		this.physics.enable(this.head, Phaser.Physics.ARCADE);
 		this.head.body.bounce.y = 0.2;
 		this.head.body.gravity.y = 80;
 
-		this.torso = this.bodyparts.create(500, 3500, 'torso');
+		this.torso = this.bodyparts.create(183, 2165, 'item');
 		this.physics.enable(this.torso, Phaser.Physics.ARCADE);
 		this.torso.body.bounce.y = 0.2;
 		this.torso.body.gravity.y = 80;
 
-		this.arms = this.bodyparts.create(700, 3500, 'arms');
+		this.arms = this.bodyparts.create(343, 253, 'item');
 		this.physics.enable(this.arms, Phaser.Physics.ARCADE);
 		this.arms.body.bounce.y = 0.2;
 		this.arms.body.gravity.y = 80;
 
-		this.legs = this.bodyparts.create(1000, 3500, 'legs');
+		this.legs = this.bodyparts.create(3286, 723, 'item');
 		this.physics.enable(this.legs, Phaser.Physics.ARCADE);
 		this.legs.body.bounce.y = 0.2;
 		this.legs.body.gravity.y = 80;
+
+		this.head.animations.add('glow', [0, 1, 2, 3, 4], 5, true);
+		this.torso.animations.add('glow', [0, 1, 2, 3, 4], 5, true);
+		this.arms.animations.add('glow', [0, 1, 2, 3, 4], 5, true);
+		this.legs.animations.add('glow', [0, 1, 2, 3, 4], 5, true);
 		//-----------------------------//
 
     },
@@ -100,87 +134,104 @@ worldshift.Game.prototype = {
     },
 
 	update: function() {
+		this.head.animations.play('glow');
+		this.torso.animations.play('glow');
+		this.arms.animations.play('glow');
+		this.legs.animations.play('glow');
 
+		this.physics.arcade.collide(this.sprite, this.groundplatform);
+		this.physics.arcade.collide(this.bodyparts, this.groundplatform);
 		this.physics.arcade.collide(this.sprite, this.platforms);
 		this.physics.arcade.collide(this.bodyparts, this.platforms);
+		this.physics.arcade.collide(this.friend, this.groundplatform);
+		this.physics.arcade.collide(this.friend, this.platforms);
 
 		if (this.checkOverlap(this.sprite, this.head)&&this.head.alive) {
 			console.log("Hit head");
 			this.head.kill();
 			spriteparts["head"] = true;
 			changeBody(this.sprite);
-			// this.sprite.loadTexture('crrr');
-			// this.sprite.body.setSize(112.5, 150);
+			changeBackground(this);
+		
 		}
 		if (this.checkOverlap(this.sprite, this.torso)&&this.torso.alive) {
 			console.log("Hit torso");
 			this.torso.kill();
 			spriteparts["torso"] = true;
 			changeBody(this.sprite);
+			//changeBackground(this);
 		}
 		if (this.checkOverlap(this.sprite, this.arms)&&this.arms.alive) {
 			console.log("Hit arms");
 			this.arms.kill();
 			spriteparts["arms"]= true;
 			changeBody(this.sprite);
+			//changeBackground(this);
 		}
 		if (this.checkOverlap(this.sprite, this.legs)&&this.legs.alive) {
 			console.log("Hit legs");
 			this.legs.kill();
 			spriteparts["legs"] = true;
 			changeBody(this.sprite);
+			//changeBackground(this);
 		}
 
+		if (this.checkOverlap(this.sprite, this.friend) && spriteparts["legs"] && spriteparts["arms"] && spriteparts["head"] && spriteparts["torso"] ) {
+			friendwalk = true;
+
+		}
+		if (friendwalk) {
+			this.friend.animations.play('winner');
+			this.friend.x-=5;
+			this.txt = this.add.text(this.camera.width / 2, this.camera.height / 2, "YOU WIN!!!! (refresh to play again)", {font: "50px Arial", fill: "#ffffff", stroke: '#000000', strokeThickness: 3});
+			this.txt.anchor.setTo(0.5, 0.5);
+			this.txt.fixedToCamera = true;
+		}
+		else {
+			this.friend.animations.play('sit');
+		}
 		//----------------------movement----------------//
 		if (this.cursors.right.isDown) {
 			if (this.cursors.up.isDown) {
-				this.sprite.frame = 10;
-				this.sprite.y-=5;
+				this.sprite.y-=10;
 			}
-			else {
-				if (rheadlegs) {
-				this.sprite.animations.play('rhlright');
-				}
-				if (rheadclegs) {
-					this.sprite.animations.play('rhclright');
-				}
-				if (cheadrlegs) {
-					this.sprite.animations.play('chrlright');
-				}
-				if (cheadclegs) {
-					this.sprite.animations.play('chlright');
+			if (rheadlegs) {
+			this.sprite.animations.play('rhlright');
+			}
+			if (rheadclegs) {
+				this.sprite.animations.play('rhclright');
+			}
+			if (cheadrlegs) {
+				this.sprite.animations.play('chrlright');
+			}
+			if (cheadclegs) {
+				this.sprite.animations.play('chlright');
 
-				}
-				this.sprite.x+=5;
 			}
+			this.sprite.x+=5;
 		}
 		else if (this.cursors.left.isDown) {
 			if (this.cursors.up.isDown) {
-				this.sprite.frame = 4;
-				this.sprite.y-=5;
+				this.sprite.y-=10;
 			}
-			else {
-				if (rheadlegs) {
-					this.sprite.animations.play('rhlleft');
-				}
-				if (rheadclegs) {
-					this.sprite.animations.play('rhclleft');
-				}
-				if (cheadrlegs) {
-					this.sprite.animations.play('chrlleft');
-				}
-				if (cheadclegs) {
-					this.sprite.animations.play('chlleft');
-				}
-				this.sprite.x-=5;
+			if (rheadlegs) {
+				this.sprite.animations.play('rhlleft');
 			}
+			if (rheadclegs) {
+				this.sprite.animations.play('rhclleft');
+			}
+			if (cheadrlegs) {
+				this.sprite.animations.play('chrlleft');
+			}
+			if (cheadclegs) {
+				this.sprite.animations.play('chlleft');
+			}
+			this.sprite.x-=5;
 		}
 		else{
 			if (this.cursors.up.isDown) {
-				this.sprite.frame = 8;
-				this.sprite.y-=5;
+				this.sprite.y-=10;
 			}
-			else {
 				if (rheadlegs) {
 					this.sprite.animations.play('rhlstand');
 				}
@@ -193,17 +244,17 @@ worldshift.Game.prototype = {
 				if (cheadclegs) {
 					this.sprite.animations.play('chlstand');
 				}
-			}
+			// if (this.cursors.down.isDown) {
+			// 	this.sprite.y+=10;
+			// }
 		}
+
 		//-------------------------------------------------//
 
 	}
-
-	// render: function() {
-	// 	this.debug.spriteInfo(this.sprite, 40, 100);
- //        this.debug.pointer(this.input.activePointer);
-	// }
 }
+
+// 
 
 
 function changeBody(sprite) {
@@ -399,4 +450,12 @@ function changeBody(sprite) {
 			}
 		}
 	}
+}
+
+function changeBackground(game) {
+	if (stage == 0) {
+		game.layer.kill();
+	}
+	
+	stage= stage+1;
 }
