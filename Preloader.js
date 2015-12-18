@@ -31,7 +31,7 @@ worldshift.Preloader.prototype = {
 
 		//------------------------------------//
 
-		this.load.image('platform', 'images/platforms/Platform3-3.png');
+		//this.load.image('platform', 'images/platforms/Platform3-3.png');
 		//---body parts----//
 		this.load.spritesheet('item', 'images/Items.png', 72, 72);
 		//------------------//

@@ -24,9 +24,8 @@ var cheadclegs = false;	// 19 frames
 worldshift.Game.prototype = {
 
 	create: function() {
-		this.world.setBounds(0, 0, 3750, 3750);
 
-		
+		this.world.setBounds(0, 0, 3750, 3750);
 		
 		this.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -36,12 +35,11 @@ worldshift.Game.prototype = {
 		this.physics.enable(this.groundplatform, Phaser.Physics.ARCADE);
 		this.groundplatform.body.immovable = true;
 
-		
-
 		for (var i = 0; i < 31; i++) {
 			this.rock = this.platforms.create(posx[i], posy[i], 'groundplatform');
 			this.rock.scale.setTo(rscale[i]);
 			this.physics.enable(this.rock, Phaser.Physics.ARCADE);
+			this.rock.body.checkCollision.down = false;
 			this.rock.body.immovable = true;
 		}
 
@@ -84,8 +82,8 @@ worldshift.Game.prototype = {
 
 		this.physics.enable(this.sprite, Phaser.Physics.ARCADE);
 		this.sprite.body.collideWorldBounds = true;
-		this.sprite.body.bounce.y = 0.2;
-		this.sprite.body.gravity.y = 400;
+		this.sprite.body.bounce.y = 0.4;
+		this.sprite.body.gravity.y = 500;
 
 		this.friend = this.add.sprite(2042, 1239, 'friend');
 		this.friend.animations.add('winner', [0, 1, 2, 1], 5, true);
@@ -108,7 +106,7 @@ worldshift.Game.prototype = {
 		this.torso.body.bounce.y = 0.2;
 		this.torso.body.gravity.y = 80;
 
-		this.arms = this.bodyparts.create(343, 253, 'item');
+		this.arms = this.bodyparts.create(500, 253, 'item');
 		this.physics.enable(this.arms, Phaser.Physics.ARCADE);
 		this.arms.body.bounce.y = 0.2;
 		this.arms.body.gravity.y = 80;
@@ -134,6 +132,10 @@ worldshift.Game.prototype = {
     },
 
 	update: function() {
+		if (this.sprite.body.onFloor()) {
+			console.log("on floor");
+		}
+
 		this.head.animations.play('glow');
 		this.torso.animations.play('glow');
 		this.arms.animations.play('glow');
@@ -191,10 +193,13 @@ worldshift.Game.prototype = {
 			this.friend.animations.play('sit');
 		}
 		//----------------------movement----------------//
+
+		this.sprite.body.velocity.x = 0;
+
 		if (this.cursors.right.isDown) {
-			if (this.cursors.up.isDown) {
-				this.sprite.y-=10;
-			}
+
+			this.sprite.body.velocity.x = 400;
+
 			if (rheadlegs) {
 			this.sprite.animations.play('rhlright');
 			}
@@ -206,14 +211,12 @@ worldshift.Game.prototype = {
 			}
 			if (cheadclegs) {
 				this.sprite.animations.play('chlright');
-
 			}
-			this.sprite.x+=5;
 		}
 		else if (this.cursors.left.isDown) {
-			if (this.cursors.up.isDown) {
-				this.sprite.y-=10;
-			}
+
+			this.sprite.body.velocity.x = -400;
+
 			if (rheadlegs) {
 				this.sprite.animations.play('rhlleft');
 			}
@@ -226,27 +229,26 @@ worldshift.Game.prototype = {
 			if (cheadclegs) {
 				this.sprite.animations.play('chlleft');
 			}
-			this.sprite.x-=5;
+
 		}
 		else{
-			if (this.cursors.up.isDown) {
-				this.sprite.y-=10;
+			if (rheadlegs) {
+				this.sprite.animations.play('rhlstand');
 			}
-				if (rheadlegs) {
-					this.sprite.animations.play('rhlstand');
-				}
-				if (rheadclegs) {
-					this.sprite.animations.play('rhclstand');
-				}
-				if (cheadrlegs) {
-					this.sprite.animations.play('chrlstand');
-				}
-				if (cheadclegs) {
-					this.sprite.animations.play('chlstand');
-				}
-			// if (this.cursors.down.isDown) {
-			// 	this.sprite.y+=10;
-			// }
+			if (rheadclegs) {
+				this.sprite.animations.play('rhclstand');
+			}
+			if (cheadrlegs) {
+				this.sprite.animations.play('chrlstand');
+			}
+			if (cheadclegs) {
+				this.sprite.animations.play('chlstand');
+			}
+
+		}
+
+		if (this.cursors.up.isDown && this.sprite.body.touching.down) {
+			this.sprite.body.velocity.y = -750;
 		}
 
 		//-------------------------------------------------//
