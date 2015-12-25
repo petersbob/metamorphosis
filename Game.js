@@ -26,6 +26,12 @@ worldshift.Game.prototype = {
 	create: function() {
 
 		this.world.setBounds(0, 0, 3750, 3750);
+
+		this.MAX_SPEED = 500;
+		this.ACCELERATION = 1500;
+		this.GRAVITY = 2600;
+		this.JUMP_SPEED = -1500;
+		this.DRAG = 600;
 		
 		this.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -48,11 +54,18 @@ worldshift.Game.prototype = {
 		this.physics.enable(this.rock, Phaser.Physics.ARCADE);
 		this.rock.body.immovable = true;
 
-		this.add.sprite(0, 0, 'conbg');
+		this.add.sprite(0, 0, 'conbg');	// background image
 
 		this.buildsprites();
 
 		this.cursors = this.input.keyboard.createCursorKeys();
+
+		this.input.keyboard.addKeyCapture([
+			Phaser.Keyboard.LEFT,
+			Phaser.Keyboard.RIGHT,
+			Phaser.Keyboard.UP,
+			Phaser.Keyboard.DOWN
+			]);
 
 	},
 
@@ -82,16 +95,17 @@ worldshift.Game.prototype = {
 
 		this.physics.enable(this.sprite, Phaser.Physics.ARCADE);
 		this.sprite.body.collideWorldBounds = true;
-		this.sprite.body.bounce.y = 0.4;
-		this.sprite.body.gravity.y = 500;
+		this.sprite.body.gravity.y = this.GRAVITY;
+		this.sprite.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 10);
+		this.sprite.body.drag.setTo(this.DRAG, 0); 
+		this.jumping = false;
 
 		this.friend = this.add.sprite(2042, 1239, 'friend');
 		this.friend.animations.add('winner', [0, 1, 2, 1], 5, true);
 		this.friend.animations.add('sit', [5, 6], 5, true);
 		this.physics.enable(this.friend, Phaser.Physics.ARCADE);
 		this.friend.body.collideWorldBounds = false;
-		this.friend.body.bounce.y = 0.2;
-		this.friend.body.gravity.y = 400;
+		this.friend.body.gravity.y = this.GRAVITY;
 		//-------------------//
 
 		//------------body parts-------//
@@ -129,6 +143,12 @@ worldshift.Game.prototype = {
     	var boundsB = spriteB.getBounds();
 
     	return Phaser.Rectangle.intersects(boundsA, boundsB);
+    },
+
+    upInputIsActive: function(duration) {
+    	var isActive = false;
+    	isActive = this.input.keyboard.downDuration(Phaser.Keyboard.UP, duration);
+    	return isActive;
     },
 
 	update: function() {
@@ -194,11 +214,9 @@ worldshift.Game.prototype = {
 		}
 		//----------------------movement----------------//
 
-		this.sprite.body.velocity.x = 0;
-
 		if (this.cursors.right.isDown) {
 
-			this.sprite.body.velocity.x = 400;
+			this.sprite.body.acceleration.x = this.ACCELERATION;
 
 			if (rheadlegs) {
 			this.sprite.animations.play('rhlright');
@@ -215,7 +233,7 @@ worldshift.Game.prototype = {
 		}
 		else if (this.cursors.left.isDown) {
 
-			this.sprite.body.velocity.x = -400;
+			this.sprite.body.acceleration.x = -this.ACCELERATION;
 
 			if (rheadlegs) {
 				this.sprite.animations.play('rhlleft');
@@ -232,6 +250,10 @@ worldshift.Game.prototype = {
 
 		}
 		else{
+
+			this.sprite.body.acceleration.x = 0;
+			this.sprite.body.velocity.x = 0;
+
 			if (rheadlegs) {
 				this.sprite.animations.play('rhlstand');
 			}
@@ -247,10 +269,23 @@ worldshift.Game.prototype = {
 
 		}
 
-		if (this.cursors.up.isDown && this.sprite.body.touching.down) {
-			this.sprite.body.velocity.y = -750;
+		// if (this.cursors.up.isDown && this.sprite.body.touching.down) {
+		// 	this.sprite.body.velocity.y = this.JUMP_SPEED;
+		// // }
+		if (this.sprite.body.touching.down) {
+			this.jumps = 2;
+			this.jumping = false;
 		}
 
+		if(this.jumps > 0 && this.upInputIsActive(5)) {
+			this.sprite.body.velocity.y = this.JUMP_SPEED;
+			this.jumping = true;
+		}
+
+		if(this.jumping && this.cursors.up.isUp) {
+			this.jumps--;
+			this.jumping = false;
+		}
 		//-------------------------------------------------//
 
 	}
