@@ -31,7 +31,7 @@ worldshift.Game.prototype = {
 		this.ACCELERATION = 1500;
 		this.GRAVITY = 2600;
 		this.JUMP_SPEED = -1500;
-		this.DRAG = 600;
+		this.DRAG = 1800;
 		
 		this.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -50,7 +50,7 @@ worldshift.Game.prototype = {
 		}
 
 		this.rock = this.platforms.create(3321, 1500, 'groundplatform');
-		this.rock.scale.setTo(rscale[i]);
+		this.rock.scale.setTo(rscale[9]);
 		this.physics.enable(this.rock, Phaser.Physics.ARCADE);
 		this.rock.body.immovable = true;
 
@@ -112,18 +112,18 @@ worldshift.Game.prototype = {
 		this.bodyparts = this.add.group();
 		this.head = this.bodyparts.create(30, 3513, 'item');
 		this.physics.enable(this.head, Phaser.Physics.ARCADE);
-		this.head.body.bounce.y = 0.2;
-		this.head.body.gravity.y = 80;
+
+		this.head.body.gravity.y = this.GRAVITY;
 
 		this.torso = this.bodyparts.create(183, 2165, 'item');
 		this.physics.enable(this.torso, Phaser.Physics.ARCADE);
-		this.torso.body.bounce.y = 0.2;
-		this.torso.body.gravity.y = 80;
+	
+		this.torso.body.gravity.y = this.GRAVITY;
 
 		this.arms = this.bodyparts.create(500, 253, 'item');
 		this.physics.enable(this.arms, Phaser.Physics.ARCADE);
-		this.arms.body.bounce.y = 0.2;
-		this.arms.body.gravity.y = 80;
+
+		this.arms.body.gravity.y = this.GRAVITY;
 
 		this.legs = this.bodyparts.create(3286, 723, 'item');
 		this.physics.enable(this.legs, Phaser.Physics.ARCADE);
@@ -152,62 +152,51 @@ worldshift.Game.prototype = {
     },
 
 	update: function() {
-		if (this.sprite.body.onFloor()) {
-			console.log("on floor");
-		}
 
 		this.head.animations.play('glow');
 		this.torso.animations.play('glow');
 		this.arms.animations.play('glow');
 		this.legs.animations.play('glow');
 
-		this.physics.arcade.collide(this.sprite, this.groundplatform);
-		this.physics.arcade.collide(this.bodyparts, this.groundplatform);
+		//this.physics.arcade.collide(this.sprite, this.groundplatform);
+		//this.physics.arcade.collide(this.bodyparts, this.groundplatform);
 		this.physics.arcade.collide(this.sprite, this.platforms);
 		this.physics.arcade.collide(this.bodyparts, this.platforms);
-		this.physics.arcade.collide(this.friend, this.groundplatform);
+		//this.physics.arcade.collide(this.friend, this.groundplatform);
 		this.physics.arcade.collide(this.friend, this.platforms);
 
 		if (this.checkOverlap(this.sprite, this.head)&&this.head.alive) {
-			console.log("Hit head");
+			
 			this.head.kill();
 			spriteparts["head"] = true;
 			changeBody(this.sprite);
-			changeBackground(this);
-		
 		}
 		if (this.checkOverlap(this.sprite, this.torso)&&this.torso.alive) {
-			console.log("Hit torso");
+			
 			this.torso.kill();
 			spriteparts["torso"] = true;
 			changeBody(this.sprite);
-			//changeBackground(this);
 		}
 		if (this.checkOverlap(this.sprite, this.arms)&&this.arms.alive) {
-			console.log("Hit arms");
+			
 			this.arms.kill();
 			spriteparts["arms"]= true;
 			changeBody(this.sprite);
-			//changeBackground(this);
 		}
 		if (this.checkOverlap(this.sprite, this.legs)&&this.legs.alive) {
-			console.log("Hit legs");
+			
 			this.legs.kill();
 			spriteparts["legs"] = true;
 			changeBody(this.sprite);
-			//changeBackground(this);
 		}
 
-		if (this.checkOverlap(this.sprite, this.friend) && spriteparts["legs"] && spriteparts["arms"] && spriteparts["head"] && spriteparts["torso"] ) {
-			friendwalk = true;
-
-		}
-		if (friendwalk) {
-			this.friend.animations.play('winner');
-			this.friend.x-=5;
-			this.txt = this.add.text(this.camera.width / 2, this.camera.height / 2, "YOU WIN!!!! (refresh to play again)", {font: "50px Arial", fill: "#ffffff", stroke: '#000000', strokeThickness: 3});
+		if (this.checkOverlap(this.sprite, this.friend) && spriteparts["legs"] && spriteparts["arms"] && spriteparts["head"] && spriteparts["torso"]) {
+			
+			this.txt = this.add.text(this.camera.width / 2, this.camera.height / 2, "YOU WIN!!!! (refresh to play again)", {font: "40px Arial", fill: "#ffffff", stroke: '#000000', strokeThickness: 3});
 			this.txt.anchor.setTo(0.5, 0.5);
 			this.txt.fixedToCamera = true;
+			this.friend.frame = 4;
+			this.game.paused = true;
 		}
 		else {
 			this.friend.animations.play('sit');
@@ -252,7 +241,6 @@ worldshift.Game.prototype = {
 		else{
 
 			this.sprite.body.acceleration.x = 0;
-			this.sprite.body.velocity.x = 0;
 
 			if (rheadlegs) {
 				this.sprite.animations.play('rhlstand');
@@ -487,12 +475,4 @@ function changeBody(sprite) {
 			}
 		}
 	}
-}
-
-function changeBackground(game) {
-	if (stage == 0) {
-		game.layer.kill();
-	}
-	
-	stage= stage+1;
 }

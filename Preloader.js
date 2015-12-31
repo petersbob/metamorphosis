@@ -40,7 +40,7 @@ worldshift.Preloader.prototype = {
 		this.load.spritesheet('rrrr', 'images/playersprites/rrrr.png', 112.5, 113);
 		this.load.spritesheet('rrrc', 'images/playersprites/rrrc.png', 110.17, 138);
 		this.load.spritesheet('rrcr', 'images/playersprites/rrcr.png', 110.17, 138);
-		this.load.spritesheet('rrcc', 'images/playersprites/rrcc.png', 110.1666, 138);
+		this.load.spritesheet('rrcc', 'images/playersprites/rrcc.png', 110.17, 138);
 		this.load.spritesheet('rcrr', 'images/playersprites/rcrr.png', 96.500, 110);
 		this.load.spritesheet('rcrc', 'images/playersprites/rcrc.png', 118.00, 125);
 		this.load.spritesheet('rccr', 'images/playersprites/rccr.png', 110.19, 136);
