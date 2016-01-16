@@ -27,36 +27,36 @@ worldshift.Game.prototype = {
 
 		this.world.setBounds(0, 0, 3750, 3750);
 
-		this.MAX_SPEED = 500;
-		this.ACCELERATION = 1500;
-		this.GRAVITY = 2600;
-		this.JUMP_SPEED = -1500;
-		this.DRAG = 1800;
-		
-		this.physics.startSystem(Phaser.Physics.ARCADE);
-
-		this.platforms = this.add.group();
-		this.groundplatform = this.platforms.create(0, 3730, 'groundplatform');
-		this.groundplatform.scale.setTo(47, 1);
-		this.physics.enable(this.groundplatform, Phaser.Physics.ARCADE);
-		this.groundplatform.body.immovable = true;
-
-		for (var i = 0; i < 31; i++) {
-			this.rock = this.platforms.create(posx[i], posy[i], 'groundplatform');
-			this.rock.scale.setTo(rscale[i]);
-			this.physics.enable(this.rock, Phaser.Physics.ARCADE);
-			this.rock.body.checkCollision.down = false;
-			this.rock.body.immovable = true;
-		}
-
-		this.rock = this.platforms.create(3321, 1500, 'groundplatform');
-		this.rock.scale.setTo(rscale[9]);
-		this.physics.enable(this.rock, Phaser.Physics.ARCADE);
-		this.rock.body.immovable = true;
-
 		this.add.sprite(0, 0, 'conbg');	// background image
+		this.physics.startSystem(Phaser.Physics.P2JS);
+		this.physics.p2.world.defaultContactMaterial.friction = 0.3;
+    	this.physics.p2.world.setGlobalStiffness(1e5);
+    	this.physics.p2.gravity.y = 350;
 
-		this.buildsprites();
+    	this.buildsprites();
+
+    	this.spriteMaterial = this.physics.p2.createMaterial('spriteMaterial', this.sprite.body);
+    	this.worldMaterial = this.physics.p2.createMaterial('worldMaterial');
+    	this.boxMaterial = this.physics.p2.createMaterial('worldMaterial');
+		this.groundPlayerCM1 = this.physics.p2.createContactMaterial(this.spriteMaterial, this.boxMaterial, { friction: 0.0 });
+
+		this.groundplatform = this.add.sprite(0, 3730, 'ground');
+		this.physics.p2.enable(this.groundplatform, true);
+		this.groundplatform.body.clearShapes();
+		this.groundplatform.body.loadPolygon('physicsdata', 'Ground');
+		this.groundplatform.body.static = true;
+		this.groundplatform.body.setMaterial(this.boxMaterial);
+
+		// for (var i = 0; i < 31; i++) {
+		// 	this.rock = this.add.sprite(posx[i], posy[i], 'groundplatform');
+		// 	this.rock.scale.setTo(rscale[i]);
+		// 	this.physics.p2.enable(this.rock);
+		// 	this.rock.body.static = true;
+		// 	this.rock.body.setMaterial(this.boxMaterial);
+		// }
+
+		this.groundPlayerCM = this.physics.p2.createContactMaterial(this.spriteMaterial, this.worldMaterial, { friction: 0.0 });
+    	this.groundBoxesCM = this.physics.p2.createContactMaterial(this.worldMaterial, this.boxMaterial, { friction: 0.6 });
 
 		this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -71,70 +71,25 @@ worldshift.Game.prototype = {
 
 	buildsprites: function() {
         //----Character---//
-        this.sprite = this.add.sprite(1922, 1426, 'rrrr');
-        this.sprite.anchor.x = 0;
-        this.sprite.anchor.y = 1;
+        this.sprite = this.add.sprite(400, 3500, 'r');
 
-        this.sprite.animations.add('chlstand', [ 9, 10, 9, 8], 3, true);
-		this.sprite.animations.add('chlleft', [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
-		this.sprite.animations.add('chlright', [11, 12, 13, 14, 15, 16, 17, 18], 10, true);
+		this.physics.p2.enable(this.sprite, true);
+		this.sprite.body.clearShapes();
+		this.sprite.body.loadPolygon('physicsdata', 'r');
 
-		this.sprite.animations.add('rhclstand', [8, 9], 3, true);
-		this.sprite.animations.add('rhclleft', [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
-		this.sprite.animations.add('rhclright', [10, 11, 12, 13, 14, 15, 16, 17], 10, true);
+		this.sprite.body.fixedRotation = true;
+    	this.sprite.body.damping = 0.5;
 
-		this.sprite.animations.add('chrlstand', [4, 5, 6, 5], 3, true);
-		this.sprite.animations.add('chrlleft', [0, 1, 2, 3], 5, true);
-		this.sprite.animations.add('chrlright', [7, 8, 9, 10], 5, true);
+    	//this.camera.follow(this.sprite);
 
-		this.sprite.animations.add('rhlstand', [4, 5], 3, true);
-		this.sprite.animations.add('rhlleft', [0, 1, 2, 3], 5, true);
-		this.sprite.animations.add('rhlright', [6, 7, 8, 9], 5, true);
+    	this.plat5_2 = this.add.sprite(400, 3500, 'platform52');
+		this.physics.p2.enable(this.plat5_2, true);
+		this.plat5_2.body.clearShapes();
+		this.plat5_2.body.loadPolygon('physicsdata', 'Platform52');
+		this.plat5_2.body.static = true;
 
-		this.camera.follow(this.sprite);
-
-		this.physics.enable(this.sprite, Phaser.Physics.ARCADE);
-		this.sprite.body.collideWorldBounds = true;
-		this.sprite.body.gravity.y = this.GRAVITY;
-		this.sprite.body.maxVelocity.setTo(this.MAX_SPEED, this.MAX_SPEED * 10);
-		this.sprite.body.drag.setTo(this.DRAG, 0); 
-		this.jumping = false;
-
-		this.friend = this.add.sprite(2042, 1239, 'friend');
-		this.friend.animations.add('winner', [0, 1, 2, 1], 5, true);
-		this.friend.animations.add('sit', [5, 6], 5, true);
-		this.physics.enable(this.friend, Phaser.Physics.ARCADE);
-		this.friend.body.collideWorldBounds = false;
-		this.friend.body.gravity.y = this.GRAVITY;
+		this.camera.follow(this.plat5_2);
 		//-------------------//
-
-		//------------body parts-------//
-		this.bodyparts = this.add.group();
-		this.head = this.bodyparts.create(30, 3513, 'item');
-		this.physics.enable(this.head, Phaser.Physics.ARCADE);
-
-		this.head.body.gravity.y = this.GRAVITY;
-
-		this.torso = this.bodyparts.create(183, 2165, 'item');
-		this.physics.enable(this.torso, Phaser.Physics.ARCADE);
-	
-		this.torso.body.gravity.y = this.GRAVITY;
-
-		this.arms = this.bodyparts.create(500, 253, 'item');
-		this.physics.enable(this.arms, Phaser.Physics.ARCADE);
-
-		this.arms.body.gravity.y = this.GRAVITY;
-
-		this.legs = this.bodyparts.create(3286, 723, 'item');
-		this.physics.enable(this.legs, Phaser.Physics.ARCADE);
-		this.legs.body.bounce.y = 0.2;
-		this.legs.body.gravity.y = 80;
-
-		this.head.animations.add('glow', [0, 1, 2, 3, 4], 5, true);
-		this.torso.animations.add('glow', [0, 1, 2, 3, 4], 5, true);
-		this.arms.animations.add('glow', [0, 1, 2, 3, 4], 5, true);
-		this.legs.animations.add('glow', [0, 1, 2, 3, 4], 5, true);
-		//-----------------------------//
 
     },
 
@@ -153,129 +108,36 @@ worldshift.Game.prototype = {
 
 	update: function() {
 
-		this.head.animations.play('glow');
-		this.torso.animations.play('glow');
-		this.arms.animations.play('glow');
-		this.legs.animations.play('glow');
-
-		//this.physics.arcade.collide(this.sprite, this.groundplatform);
-		//this.physics.arcade.collide(this.bodyparts, this.groundplatform);
-		this.physics.arcade.collide(this.sprite, this.platforms);
-		this.physics.arcade.collide(this.bodyparts, this.platforms);
-		//this.physics.arcade.collide(this.friend, this.groundplatform);
-		this.physics.arcade.collide(this.friend, this.platforms);
-
-		if (this.checkOverlap(this.sprite, this.head)&&this.head.alive) {
-			
-			this.head.kill();
-			spriteparts["head"] = true;
-			changeBody(this.sprite);
-		}
-		if (this.checkOverlap(this.sprite, this.torso)&&this.torso.alive) {
-			
-			this.torso.kill();
-			spriteparts["torso"] = true;
-			changeBody(this.sprite);
-		}
-		if (this.checkOverlap(this.sprite, this.arms)&&this.arms.alive) {
-			
-			this.arms.kill();
-			spriteparts["arms"]= true;
-			changeBody(this.sprite);
-		}
-		if (this.checkOverlap(this.sprite, this.legs)&&this.legs.alive) {
-			
-			this.legs.kill();
-			spriteparts["legs"] = true;
-			changeBody(this.sprite);
-		}
-
-		if (this.checkOverlap(this.sprite, this.friend) && spriteparts["legs"] && spriteparts["arms"] && spriteparts["head"] && spriteparts["torso"]) {
-			
-			this.txt = this.add.text(this.camera.width / 2, this.camera.height / 2, "YOU WIN!!!! (refresh to play again)", {font: "40px Arial", fill: "#ffffff", stroke: '#000000', strokeThickness: 3});
-			this.txt.anchor.setTo(0.5, 0.5);
-			this.txt.fixedToCamera = true;
-			this.friend.frame = 4;
-			this.game.paused = true;
-		}
-		else {
-			this.friend.animations.play('sit');
-		}
-		//----------------------movement----------------//
+		// this.head.animations.play('glow');
+		// this.torso.animations.play('glow');
+		// this.arms.animations.play('glow');
+		// this.legs.animations.play('glow');
 
 		if (this.cursors.right.isDown) {
 
-			this.sprite.body.acceleration.x = this.ACCELERATION;
+			this.sprite.body.moveRight(200);
+			this.plat5_2.body.x+= 5;
 
-			if (rheadlegs) {
-			this.sprite.animations.play('rhlright');
-			}
-			if (rheadclegs) {
-				this.sprite.animations.play('rhclright');
-			}
-			if (cheadrlegs) {
-				this.sprite.animations.play('chrlright');
-			}
-			if (cheadclegs) {
-				this.sprite.animations.play('chlright');
-			}
 		}
 		else if (this.cursors.left.isDown) {
 
-			this.sprite.body.acceleration.x = -this.ACCELERATION;
-
-			if (rheadlegs) {
-				this.sprite.animations.play('rhlleft');
-			}
-			if (rheadclegs) {
-				this.sprite.animations.play('rhclleft');
-			}
-			if (cheadrlegs) {
-				this.sprite.animations.play('chrlleft');
-			}
-			if (cheadclegs) {
-				this.sprite.animations.play('chlleft');
-			}
+			this.sprite.body.moveLeft(200);
+			this.plat5_2.body.x-= 5;
 
 		}
 		else{
-
-			this.sprite.body.acceleration.x = 0;
-
-			if (rheadlegs) {
-				this.sprite.animations.play('rhlstand');
-			}
-			if (rheadclegs) {
-				this.sprite.animations.play('rhclstand');
-			}
-			if (cheadrlegs) {
-				this.sprite.animations.play('chrlstand');
-			}
-			if (cheadclegs) {
-				this.sprite.animations.play('chlstand');
-			}
+			this.sprite.body.velocity.x = 0;
 
 		}
 
-		// if (this.cursors.up.isDown && this.sprite.body.touching.down) {
-		// 	this.sprite.body.velocity.y = this.JUMP_SPEED;
-		// // }
-		if (this.sprite.body.touching.down) {
-			this.jumps = 2;
-			this.jumping = false;
+		if (this.cursors.up.isDown) {
+			this.sprite.body.moveUp(300);
+			this.plat5_2.body.y-= 5;
 		}
+	},
 
-		if(this.jumps > 0 && this.upInputIsActive(5)) {
-			this.sprite.body.velocity.y = this.JUMP_SPEED;
-			this.jumping = true;
-		}
-
-		if(this.jumping && this.cursors.up.isUp) {
-			this.jumps--;
-			this.jumping = false;
-		}
-		//-------------------------------------------------//
-
+	render: function() {
+		this.game.debug.body(this.sprite);
 	}
 }
 
