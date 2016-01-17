@@ -27,7 +27,7 @@ worldshift.Game.prototype = {
 
 		this.world.setBounds(0, 0, 3750, 3750);
 
-		this.add.sprite(0, 0, 'conbg');	// background image
+		//this.add.sprite(0, 0, 'conbg');	// background image
 		this.physics.startSystem(Phaser.Physics.P2JS);
 		this.physics.p2.world.defaultContactMaterial.friction = 0.3;
     	this.physics.p2.world.setGlobalStiffness(1e5);
@@ -40,7 +40,7 @@ worldshift.Game.prototype = {
     	this.boxMaterial = this.physics.p2.createMaterial('worldMaterial');
 		this.groundPlayerCM1 = this.physics.p2.createContactMaterial(this.spriteMaterial, this.boxMaterial, { friction: 0.0 });
 
-		this.groundplatform = this.add.sprite(0, 3730, 'ground');
+		this.groundplatform = this.add.sprite(0, 3730, 'Ground');
 		this.physics.p2.enable(this.groundplatform, true);
 		this.groundplatform.body.clearShapes();
 		this.groundplatform.body.loadPolygon('physicsdata', 'Ground');
@@ -71,24 +71,36 @@ worldshift.Game.prototype = {
 
 	buildsprites: function() {
         //----Character---//
-        this.sprite = this.add.sprite(400, 3500, 'r');
+        this.sprite = this.add.sprite(400, 3000, 'r');
 
-		this.physics.p2.enable(this.sprite, true);
-		this.sprite.body.clearShapes();
-		this.sprite.body.loadPolygon('physicsdata', 'r');
+		this.physics.p2.enable(this.sprite, false);
+		// this.sprite.body.clearShapes();
+		// this.sprite.body.loadPolygon('physicsdata', 'r');
+		this.sprite.body.setCircle(45);
 
 		this.sprite.body.fixedRotation = true;
     	this.sprite.body.damping = 0.5;
 
     	//this.camera.follow(this.sprite);
 
-    	this.plat5_2 = this.add.sprite(400, 3500, 'platform52');
+    	console.log(my_j[0]);
+    	for(var i = 0; i < my_j.length; i++) {
+    		if (i != 31 && i != 1) {
+    			this.platform = this.add.sprite(400, i*100+200, my_j[i]);
+    			this.physics.p2.enable(this.platform, false);
+				this.platform.body.clearShapes();
+				this.platform.body.loadPolygon('physicsdata', my_j[i]);
+				this.platform.body.static = true;
+    		}
+    	}
+
+    	this.plat5_2 = this.add.sprite(400, 3500, 'platform5-2');
 		this.physics.p2.enable(this.plat5_2, true);
 		this.plat5_2.body.clearShapes();
-		this.plat5_2.body.loadPolygon('physicsdata', 'Platform52');
+		this.plat5_2.body.loadPolygon('physicsdata', 'Platform5-2');
 		this.plat5_2.body.static = true;
 
-		this.camera.follow(this.plat5_2);
+		this.camera.follow(this.sprite);
 		//-------------------//
 
     },
@@ -116,13 +128,13 @@ worldshift.Game.prototype = {
 		if (this.cursors.right.isDown) {
 
 			this.sprite.body.moveRight(200);
-			this.plat5_2.body.x+= 5;
+			//this.plat5_2.body.x+= 5;
 
 		}
 		else if (this.cursors.left.isDown) {
 
 			this.sprite.body.moveLeft(200);
-			this.plat5_2.body.x-= 5;
+			//this.plat5_2.body.x-= 5;
 
 		}
 		else{
@@ -132,7 +144,7 @@ worldshift.Game.prototype = {
 
 		if (this.cursors.up.isDown) {
 			this.sprite.body.moveUp(300);
-			this.plat5_2.body.y-= 5;
+			//this.plat5_2.body.y-= 5;
 		}
 	},
 

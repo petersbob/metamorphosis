@@ -13,7 +13,6 @@ worldshift.StartMenu.prototype = {
 		
 		this.startbutton = this.add.button(this.world.centerX, 330, 'startbutton', this.startGame, this);
 		this.startbutton.anchor.setTo(0.5, 0.5);
-		
 	},
 
 	startGame: function (pointer) {
