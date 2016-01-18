@@ -6,9 +6,8 @@ worldshift.Game = function(game) {
 var stage = 1;
 var friendwalk = false;
 
-var posx = [249, 998, 1326, 1773, 3120, 3107,3124, 104, 443, 1750, 97, 514, 620, 679, 768, 906, 612, 814, 1136, 1255, 1672, 2014, 2551, 2868, 3149, 3563, 3288, 2835, 3132, 3295, 3493, 3224, 34991]
-var posy = [318, 639, 758, 895, 933, 1279, 1226, 1176, 1611, 1531, 2266, 2486, 2372, 2326, 2273, 2153, 2631, 2965, 3266, 3410, 3600, 2842, 2598, 1959, 2155, 2377, 2733, 2892, 3023, 3244, 3497, 1584, 3501]
-var rscale = [4, 2, 2, 7, 5, 1, 2, 4, 5, 4, 3, 1, 1, 1, 2, 3, 4, 3, 5, 4, 4, 5, 5, 8, 3, 4, 2, 6, 2, 7, 4]
+var posx = [700, 0, 3630, 3000, 3425, 3190, 3390, 00, 00, 2305, 1570, 1775, 3060, 1290, 985, 645, 2690, 220, 155, 745, 1165, 900, 460, 1765, 3385, 3440, 2735, 3220, 2450, 3395, 3135]
+var posy = [1605, 0, 1815, 2885, 2735, 3015, 3265, 00, 00, 2860, 3385, 3600, 2250, 3305, 2980, 2690, 2595,1210, 2060, 2395, 2155, 1950, 415, 785, 975, 700, 1175, 1455, 1920, 1520, 1960]
 
 var spriteparts = {
       "head": false,
@@ -27,7 +26,7 @@ worldshift.Game.prototype = {
 
 		this.world.setBounds(0, 0, 3750, 3750);
 
-		//this.add.sprite(0, 0, 'conbg');	// background image
+		this.add.sprite(0, 0, 'conbg');	// background image
 		this.physics.startSystem(Phaser.Physics.P2JS);
 		this.physics.p2.world.defaultContactMaterial.friction = 0.3;
     	this.physics.p2.world.setGlobalStiffness(1e5);
@@ -47,18 +46,11 @@ worldshift.Game.prototype = {
 		this.groundplatform.body.static = true;
 		this.groundplatform.body.setMaterial(this.boxMaterial);
 
-		// for (var i = 0; i < 31; i++) {
-		// 	this.rock = this.add.sprite(posx[i], posy[i], 'groundplatform');
-		// 	this.rock.scale.setTo(rscale[i]);
-		// 	this.physics.p2.enable(this.rock);
-		// 	this.rock.body.static = true;
-		// 	this.rock.body.setMaterial(this.boxMaterial);
-		// }
-
 		this.groundPlayerCM = this.physics.p2.createContactMaterial(this.spriteMaterial, this.worldMaterial, { friction: 0.0 });
     	this.groundBoxesCM = this.physics.p2.createContactMaterial(this.worldMaterial, this.boxMaterial, { friction: 0.6 });
 
 		this.cursors = this.input.keyboard.createCursorKeys();
+		this.jumpButton = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
 		this.input.keyboard.addKeyCapture([
 			Phaser.Keyboard.LEFT,
@@ -71,26 +63,33 @@ worldshift.Game.prototype = {
 
 	buildsprites: function() {
         //----Character---//
-        this.sprite = this.add.sprite(400, 3000, 'r');
+        this.sprite = this.add.sprite(400, 3000, 'rrrr');
 
-		this.physics.p2.enable(this.sprite, false);
-		// this.sprite.body.clearShapes();
-		// this.sprite.body.loadPolygon('physicsdata', 'r');
-		this.sprite.body.setCircle(45);
+		this.physics.p2.enable(this.sprite, true);
+		//this.sprite.body.clearShapes();
+		//this.sprite.body.loadPolygon('physicsdata', 'r');
+		this.sprite.body.setCircle(30);
 
 		this.sprite.body.fixedRotation = true;
     	this.sprite.body.damping = 0.5;
 
-    	//this.camera.follow(this.sprite);
+    	this.sprite.animations.add('rhlstand', [4, 5], 3, true);
+		this.sprite.animations.add('rhlleft', [0, 1, 2, 3], 5, true);
+		this.sprite.animations.add('rhlright', [6, 7, 8, 9], 5, true);
 
+    	this.camera.follow(this.sprite);
+
+    	this.jumping = false; // if the sprite is jumping
+
+    	var platformarr=[];
     	console.log(my_j[0]);
     	for(var i = 0; i < my_j.length; i++) {
     		if (i != 31 && i != 1) {
-    			this.platform = this.add.sprite(400, i*100+200, my_j[i]);
-    			this.physics.p2.enable(this.platform, false);
-				this.platform.body.clearShapes();
-				this.platform.body.loadPolygon('physicsdata', my_j[i]);
-				this.platform.body.static = true;
+    			platformarr[i] =this.add.sprite(posx[i], posy[i], my_j[i]);
+    			this.physics.p2.enable(platformarr[i], false);
+				platformarr[i].body.clearShapes();
+				platformarr[i].body.loadPolygon('physicsdata', my_j[i]);
+				platformarr[i].body.static = true;
     		}
     	}
 
@@ -99,11 +98,30 @@ worldshift.Game.prototype = {
 		this.plat5_2.body.clearShapes();
 		this.plat5_2.body.loadPolygon('physicsdata', 'Platform5-2');
 		this.plat5_2.body.static = true;
-
-		this.camera.follow(this.sprite);
 		//-------------------//
 
     },
+
+    checkIfCanJump: function() {
+
+    var result = false;
+    var yAxis = p2.vec2.fromValues(0, 1);
+
+    for (var i=0; i < this.physics.p2.world.narrowphase.contactEquations.length; i++) {
+        var c = this.physics.p2.world.narrowphase.contactEquations[i];
+
+        if (c.bodyA === this.sprite.body.data || c.bodyB === this.sprite.body.data){
+            var d = p2.vec2.dot(c.normalA, yAxis);
+            if (c.bodyA === this.sprite.body.data){
+                d *= -1;
+            }
+            if (d > 0.5){
+                result = true;
+            }
+        }
+    }
+    return result;
+	},
 
     checkOverlap: function(spriteA, spriteB) {
     	var boundsA = spriteA.getBounds();
@@ -118,6 +136,12 @@ worldshift.Game.prototype = {
     	return isActive;
     },
 
+    upInputIsReleased: function() {
+    	var released = false;
+    	released = this.input.keyboard.upDuration(Phaser.Keyboard.UP);
+    	return released;
+    },
+
 	update: function() {
 
 		// this.head.animations.play('glow');
@@ -126,35 +150,51 @@ worldshift.Game.prototype = {
 		// this.legs.animations.play('glow');
 
 		if (this.cursors.right.isDown) {
+		
 
-			this.sprite.body.moveRight(200);
-			//this.plat5_2.body.x+= 5;
+			this.sprite.body.moveRight(400);
+			this.sprite.animations.play('rhlright');
+			//debugplat.body.x+= 5;
 
 		}
 		else if (this.cursors.left.isDown) {
-
-			this.sprite.body.moveLeft(200);
-			//this.plat5_2.body.x-= 5;
+			
+			this.sprite.body.moveLeft(400);
+			this.sprite.animations.play('rhlleft');
+			//debugplat.body.x-= 5;
 
 		}
 		else{
 			this.sprite.body.velocity.x = 0;
+			this.sprite.animations.play('rhlstand');
 
 		}
 
-		if (this.cursors.up.isDown) {
-			this.sprite.body.moveUp(300);
-			//this.plat5_2.body.y-= 5;
+		var onTheGround = this.checkIfCanJump();
+
+		if (onTheGround) {
+			this.jumps = 2;
+			this.jumping = false;
 		}
+
+		if (this.jumps > 0 && this.upInputIsActive(5)) {
+			this.sprite.body.moveUp(400);
+			this.jumping = true;
+		}
+
+		if (this.jumping && this.upInputReleased()) {
+			this.jumps--;
+			this.jumping = false;
+		}
+
 	},
 
 	render: function() {
-		this.game.debug.body(this.sprite);
+		// this.game.debug.body(this.sprite);
 	}
 }
 
 // 
-
 
 function changeBody(sprite) {
 	if ( spriteparts["head"]) {
