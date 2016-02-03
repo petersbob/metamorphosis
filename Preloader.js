@@ -81,6 +81,7 @@ worldshift.Preloader.prototype = {
 		//------------------//
 		//---------------spritesheets---------------//
 		this.load.spritesheet('rrrr', 'images/playersprites/rrrr.png', 112.5, 113);
+		this.load.spritesheet('head', 'images/playersprites/head.png', 96.222, 96);
 		// this.load.spritesheet('rrrc', 'images/playersprites/rrrc.png', 110.17, 138);
 		// this.load.spritesheet('rrcr', 'images/playersprites/rrcr.png', 110.17, 138);
 		// this.load.spritesheet('rrcc', 'images/playersprites/rrcc.png', 110.17, 138);
