@@ -73,11 +73,14 @@ worldshift.Game.prototype = {
 		this.sprite.body.fixedRotation = true;
     	this.sprite.body.damping = 0.5;
 
-    	this.sprite.animations.add('rhlstand', [4, 5], 3, true);
-		this.sprite.animations.add('rhlleft', [0, 1, 2, 3], 5, true);
-		this.sprite.animations.add('rhlright', [6, 7, 8, 9], 5, true);
-
+    	this.sprite.animations.add('rstand', [6, 7], 5, true);
+		this.sprite.animations.add('cstand', [1, 2, 3], 3, true);
     	this.camera.follow(this.sprite);
+
+    	this.head = this.add.sprite(400, 3000, 'head');
+    	this.head.animations.add('rhlstand', [4, 5], 3, true);
+		this.head.animations.add('rhlleft', [0, 1, 2, 3], 5, true);
+		this.head.animations.add('rhlright', [6, 7, 8, 9], 5, true);
 
     	this.jumping = false; // if the sprite is jumping
 
@@ -154,19 +157,22 @@ worldshift.Game.prototype = {
 
 			this.sprite.body.moveRight(400);
 			this.sprite.animations.play('rhlright');
-			//debugplat.body.x+= 5;
+			this.head.frame = 8;
+			debugplat.body.x+= 5;
 
 		}
 		else if (this.cursors.left.isDown) {
 			
 			this.sprite.body.moveLeft(400);
 			this.sprite.animations.play('rhlleft');
-			//debugplat.body.x-= 5;
+			this.head.frame = 4;
+			debugplat.body.x-= 5;
 
 		}
 		else{
 			this.sprite.body.velocity.x = 0;
 			this.sprite.animations.play('rhlstand');
+			this.head.animations.play('rstand');
 
 		}
 
