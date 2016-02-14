@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width">
 	<title>Test</title>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="libs/phaser.min.js"></script>
     <script src="Boot.js"></script>
     <script src="Preloader.js"></script>
@@ -25,7 +26,7 @@
 
     <script type="text/javascript">
         window.onload = function() {
-            var game = new Phaser.Game(750, 500, Phaser.AUTO, '');
+            var game = new Phaser.Game(1125, 750, Phaser.AUTO, '');
             game.state.add('Boot', worldshift.Boot);
             game.state.add('Preloader', worldshift.Preloader);
             game.state.add('StartMenu', worldshift.StartMenu);
