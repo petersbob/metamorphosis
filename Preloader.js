@@ -1,4 +1,4 @@
-console.log("Preloader.js being read");
+pconsole.log("Preloader.js being read");
 worldshift.Preloader = function(game) {
 	this.ready = false;
 };
@@ -81,6 +81,7 @@ worldshift.Preloader.prototype = {
 		//------------------//
 		//---------------spritesheets---------------//
 		this.load.spritesheet('rrrr', 'images/playersprites/rrrr.png', 112.5, 113);
+
 		//this.load.spritesheet('head', 'images/playersprites/head.png', 866, 96);
 
 		this.load.spritesheet('friend', 'images/playersprites/Friend.png', 150, 250);

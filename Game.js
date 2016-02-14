@@ -71,7 +71,6 @@ worldshift.Game.prototype = {
 		this.sprite.body.setCircle(30);
 
 		this.sprite.body.fixedRotation = true;
-    	this.sprite.body.damping = 0.5;
 
     	this.sprite.animations.add('rstand', [6, 7], 5, true);
 		this.sprite.animations.add('cstand', [1, 2, 3], 3, true);
@@ -83,6 +82,13 @@ worldshift.Game.prototype = {
 		this.head.animations.add('rhlright', [6, 7, 8, 9], 5, true);
 
     	this.jumping = false; // if the sprite is jumping
+
+    	this.head = this.add.sprite(400, 3000, 'head');
+
+    	this.head.animations.add('rstand', [6, 7], 5, true);
+		this.head.animations.add('cstand', [1, 2, 3], 5, true);
+
+    	this.camera.follow(this.sprite);
 
     	var platformarr=[];
     	console.log(my_j[0]);
@@ -146,6 +152,7 @@ worldshift.Game.prototype = {
     },
 
 	update: function() {
+		this.head.position.set(this.sprite.position.x-60, this.sprite.position.y-70);
 
 		// this.head.animations.play('glow');
 		// this.torso.animations.play('glow');
@@ -153,11 +160,11 @@ worldshift.Game.prototype = {
 		// this.legs.animations.play('glow');
 
 		if (this.cursors.right.isDown) {
-		
 
 			this.sprite.body.moveRight(400);
 			this.sprite.animations.play('rhlright');
 			this.head.frame = 8;
+
 			debugplat.body.x+= 5;
 
 		}
@@ -165,6 +172,7 @@ worldshift.Game.prototype = {
 			
 			this.sprite.body.moveLeft(400);
 			this.sprite.animations.play('rhlleft');
+
 			this.head.frame = 4;
 			debugplat.body.x-= 5;
 
@@ -179,7 +187,7 @@ worldshift.Game.prototype = {
 		var onTheGround = this.checkIfCanJump();
 
 		if (onTheGround) {
-			this.jumps = 2;
+			this.jumps = 1;
 			this.jumping = false;
 		}
 
@@ -188,7 +196,7 @@ worldshift.Game.prototype = {
 			this.jumping = true;
 		}
 
-		if (this.jumping && this.upInputReleased()) {
+		if (this.jumping && this.upInputIsReleased()) {
 			this.jumps--;
 			this.jumping = false;
 		}
