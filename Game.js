@@ -20,17 +20,21 @@ var rheadclegs = false;	//18 frames
 var cheadrlegs = false;	// 11 frames
 var cheadclegs = false;	// 19 frames
 
+var standing = true;
+var left = true;
+var right = false;
+
 worldshift.Game.prototype = {
 
 	create: function() {
 
-		this.world.setBounds(0, 0, 3750, 3750);
+	    this.world.setBounds(0, 0, 3750, 3750);
 
 		this.add.sprite(0, 0, 'conbg');	// background image
 		this.physics.startSystem(Phaser.Physics.P2JS);
 		this.physics.p2.world.defaultContactMaterial.friction = 0.3;
     	this.physics.p2.world.setGlobalStiffness(1e5);
-    	this.physics.p2.gravity.y = 350;
+    	    this.physics.p2.gravity.y = 350;
 
     	this.buildsprites();
 
@@ -52,41 +56,22 @@ worldshift.Game.prototype = {
 		this.cursors = this.input.keyboard.createCursorKeys();
 		this.jumpButton = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-		this.input.keyboard.addKeyCapture([
-			Phaser.Keyboard.LEFT,
-			Phaser.Keyboard.RIGHT,
-			Phaser.Keyboard.UP,
-			Phaser.Keyboard.DOWN
-			]);
-
 	},
 
 	buildsprites: function() {
-        //----Character---//
-        this.sprite = this.add.sprite(400, 3000, 'rrrr');
+		console.log("Entered buildSprites");
 
-		this.physics.p2.enable(this.sprite, true);
+		this.addDragonBones();
+            //start a run-loop for dragonbones, firing every 20ms
+        //this.time.events.loop(20, this.update, this);
+        //----Character---//
+
 		//this.sprite.body.clearShapes();
 		//this.sprite.body.loadPolygon('physicsdata', 'r');
-		this.sprite.body.setCircle(30);
 
-		this.sprite.body.fixedRotation = true;
-
-    	this.sprite.animations.add('rstand', [6, 7], 5, true);
-		this.sprite.animations.add('cstand', [1, 2, 3], 3, true);
     	this.camera.follow(this.sprite);
 
-    	this.head = this.add.sprite(400, 3000, 'head');
-    	this.head.animations.add('rhlstand', [4, 5], 3, true);
-		this.head.animations.add('rhlleft', [0, 1, 2, 3], 5, true);
-		this.head.animations.add('rhlright', [6, 7, 8, 9], 5, true);
-
     	this.jumping = false; // if the sprite is jumping
-
-    	this.head = this.add.sprite(400, 3000, 'head');
-
-    	this.head.animations.add('rstand', [6, 7], 5, true);
-		this.head.animations.add('cstand', [1, 2, 3], 5, true);
 
     	this.camera.follow(this.sprite);
 
@@ -95,7 +80,7 @@ worldshift.Game.prototype = {
     	for(var i = 0; i < my_j.length; i++) {
     		if (i != 31 && i != 1) {
     			platformarr[i] =this.add.sprite(posx[i], posy[i], my_j[i]);
-    			this.physics.p2.enable(platformarr[i], false);
+    			this.physics.p2.enable(platformarr[i], true);
 				platformarr[i].body.clearShapes();
 				platformarr[i].body.loadPolygon('physicsdata', my_j[i]);
 				platformarr[i].body.static = true;
@@ -152,255 +137,130 @@ worldshift.Game.prototype = {
     },
 
 	update: function() {
-		this.head.position.set(this.sprite.position.x-60, this.sprite.position.y-70);
-
-		// this.head.animations.play('glow');
-		// this.torso.animations.play('glow');
-		// this.arms.animations.play('glow');
-		// this.legs.animations.play('glow');
 
 		if (this.cursors.right.isDown) {
-
-			this.sprite.body.moveRight(400);
-			this.sprite.animations.play('rhlright');
-			this.head.frame = 8;
-
-			debugplat.body.x+= 5;
+		    left = true;
+		    this.sprite.body.moveRight(400);
+		    
+		    if(left && this.armature.animation.getLastAnimationName() != "walk") {
+			this.sprite.scale.x = -1;
+			this.armature.animation.gotoAndPlay("walk", 0);
+			left = true
+		    }
 
 		}
 		else if (this.cursors.left.isDown) {
-			
-			this.sprite.body.moveLeft(400);
-			this.sprite.animations.play('rhlleft');
-
-			this.head.frame = 4;
-			debugplat.body.x-= 5;
-
-		}
-		else{
-			this.sprite.body.velocity.x = 0;
-			this.sprite.animations.play('rhlstand');
-			this.head.animations.play('rstand');
+		    right = true;
+		    this.sprite.body.moveLeft(400);
+		    
+		    if (right && this.armature.animation.getLastAnimationName() != "walk") {
+			this.sprite.scale.x = 1;
+			this.armature.animation.gotoAndPlay("walk", 0);
+			right = true;
+		    }
 
 		}
+	    else {
+		this.sprite.body.velocity.x = 0;
+		if (this.armature.animation.getLastAnimationName() != "stand") {
+		    this.armature.animation.gotoAndPlay("stand", 0);
+		}
+	    }
 
-		var onTheGround = this.checkIfCanJump();
+	    var onTheGround = this.checkIfCanJump();
 
 		if (onTheGround) {
 			this.jumps = 1;
 			this.jumping = false;
 		}
 
-		if (this.jumps > 0 && this.upInputIsActive(5)) {
-			this.sprite.body.moveUp(400);
+/*		if (this.jumps > 0 && this.upInputIsActive(5)) {
+		    this.sprite.body.moveUp(400);
+		    this.armature.animation.gotoAndPlay("jump", 0);
 			this.jumping = true;
 		}
 
-		if (this.jumping && this.upInputIsReleased()) {
+	    if (this.jumping && this.upInputIsReleased()) {
+		this.armature.animation.gotoAndPlay("fall");
 			this.jumps--;
 			this.jumping = false;
-		}
+		}*/
+
+	    dragonBones.animation.WorldClock.clock.advanceTime(0.02);
 
 	},
 
 	render: function() {
 		// this.game.debug.body(this.sprite);
-	}
-}
+	}, 
 
-// 
+	addDragonBones: function() {
+		console.log("Inside addDragonBones");
+	    this.sprite = this.add.sprite(400, 500);
+	    this.physics.p2.enable(this.sprite, true);
+	    this.sprite.body.setCircle(40, 0, 0);
+	    this.sprite.body.collideWorldBounds = true;
+	    this.sprite.body.kinetic = true;
+	    this.sprite.body.fixedRotation  = true;
 
-function changeBody(sprite) {
-	if ( spriteparts["head"]) {
-		if (spriteparts["torso"]) {
 
-			if (spriteparts["arms"]) {
-				if (spriteparts["legs"]) {
-					//cccc
-					sprite.loadTexture("cccc");
-					//sprite.y-=25;
-    				sprite.body.setSize(112.73, 154);
-    				rheadlegs = false;
-					rheadclegs = false;
-					cheadrlegs = false;
-					cheadclegs = true;
-				}
-				else {
-					//cccr
-					sprite.loadTexture("cccr");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.36, 135);
-    				rheadlegs = false;
-					rheadclegs = false;
-					cheadrlegs = true;
-					cheadclegs = false;
-				}
-			}
-			else {
-				if (spriteparts["legs"]) {
-					//ccrc
-					sprite.loadTexture("ccrc");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.21, 151);
-    				rheadlegs = false;
-					rheadclegs = false;
-					cheadrlegs = false;
-					cheadclegs = true;
-				}
-				else {
-					//ccrr
-					sprite.loadTexture("ccrr");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.18, 159);
-    				rheadlegs = false;
-					rheadclegs = false;
-					cheadrlegs = true;
-					cheadclegs = false;
-				}
-			}
-		}
-		else {
-			if (spriteparts["arms"]) {
-				if (spriteparts["legs"]) {
-					//crcc
-					sprite.loadTexture("crcc");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.21, 144);
-    				rheadlegs = false;
-					rheadclegs = false;
-					cheadrlegs = false;
-					cheadclegs = true;
-				}
-				else {
-					//crcr
-					sprite.loadTexture("crcr");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.18, 138);
-    				rheadlegs = false;
-					rheadclegs = false;
-					cheadrlegs = true;
-					cheadclegs = false;
-				}
-			}
-			else {
-				if (spriteparts["legs"]) {
-					//crrc
-					sprite.loadTexture("crrc");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.12, 139);
-    				rheadlegs = false;
-					rheadclegs = false;
-					cheadrlegs = false;
-					cheadclegs = true;
+	   dragonBones.game = this;
+            // hardcoded ids for the dragonBones elements to target
+            var armatureName = "Dragon";//PigDragonBones";
+            var skeletonId = "Dragon";//piggy";
+            var animationId = "walk";//run";
+            // fetch the skeletonData from cache
+            var skeletonJSON = this.cache.getJSON('dragon');
+            // fetch the atlas data from cache
+            var atlasJson = this.cache.getJSON('dragon_atlas');
+            // make an array listing the names of which images to use from the atlas
+            //var partsList = ["arm_front", "head_ninja", "body", "fore_leg", "rear_leg", "rear arm"];
+            var partsList = [
+                        "armL.png",
+                        "armR.png",
+                        "armUpperL.png",
+                        "armUpperR.png",
+                        "beardL.png",
+                        "beardR.png",
+                        "body.png",
+                        "clothes1.png",
+                        "eyeL.png",
+                        "eyeR.png",
+                        "hair.png",
+                        "handL.png",
+                        "handR.png",
+                        "head.png",
+                        "legL.png",
+                        "legR.png",
+                        "tail.png",
+                        "tailTip.png"
+                        ];
+            // fetch the atlas image
+            var texture = this.cache.getImage("dragon_image");
+            // and the atlas id
+            var atlasId = 'atlas1';
+            // pass the variables all through to a utility method to generate the dragonBones armature
 
-				}
-				else {
-					//crrr
-					sprite.loadTexture("crrr");
-					//sprite.y-=25;
-    				sprite.body.setSize(112.56, 144);
-    				rheadlegs = false;
-					rheadclegs = false;
-					cheadrlegs = true;
-					cheadclegs = false;
-				}
-			}
-		}
+            var config = {
+                armatureName: armatureName,
+                skeletonId: skeletonId,
+                animationId: animationId,
+                atlasId: atlasId,
+                partsList: partsList
+            };
 
-	}
-	else {
-		if (spriteparts["torso"]) {
+            this.armature = dragonBones.makeArmaturePhaser(config, skeletonJSON, atlasJson, texture);
 
-			if (spriteparts["arms"]) {
-				if (spriteparts["legs"]) {
-					//rccc
-					sprite.loadTexture("rccc");
-					//sprite.y-=25;
-    				sprite.body.setSize(112.56, 108);
-    				rheadlegs = false;
-					rheadclegs = true;
-					cheadrlegs = false;
-					cheadclegs = false;
-				}
-				else {
-					//rccr
-					sprite.loadTexture("rccr");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.19, 136);
-    				rheadlegs = true;
-					rheadclegs = false;
-					cheadrlegs = false;
-					cheadclegs = false;
-				}
-			}
-			else {
-				if (spriteparts["legs"]) {
-					//rcrc
-					sprite.loadTexture("rcrc");
-					//sprite.y-=25;
-    				sprite.body.setSize(118.00, 125);
-    				rheadlegs = false;
-					rheadclegs = true;
-					cheadrlegs = false;
-					cheadclegs = false;
-				}
-				else {
-					//rcrr
-					sprite.loadTexture("rcrr");
-					//sprite.y-=25;
-    				sprite.body.setSize(96.50, 110);
-    				rheadlegs = true;
-					rheadclegs = false;
-					cheadrlegs = false;
-					cheadclegs = false;
-				}
-			}
-		}
-		else {
-			if (spriteparts["arms"]) {
-				if (spriteparts["legs"]) {
-					//rrcc
-					sprite.loadTexture("rrcc");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.1666, 138);
-    				rheadlegs = true;
-					rheadclegs = false;
-					cheadrlegs = false;
-					cheadclegs = false;
-				}
-				else {
-					//rrcr
-					sprite.loadTexture("rrcr");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.17, 138);
-    				rheadlegs = false;
-					rheadclegs = true;
-					cheadrlegs = false;
-					cheadclegs = false;
-				}
-			}
-			else {
-				if (spriteparts["legs"]) {
-					//rrrc
-					sprite.loadTexture("rrrc");
-					//sprite.y-=25;
-    				sprite.body.setSize(110.17, 138);
-    				rheadlegs = false;
-					rheadclegs = true;
-					cheadrlegs = false;
-					cheadclegs = false;
-				}
-				else {
-					//rrrr
-					sprite.loadTexture("rrrr");
-					//sprite.y-=25;
-    				sprite.body.setSize(112.5, 113);
-    				rheadlegs = true;
-					rheadclegs = false;
-					cheadrlegs = false;
-					cheadclegs = false;
-				}
-			}
-		}
+
+            //var armature = dragonBones.makePhaserArmature(armatureName, skeletonId, animationId, skeletonData, atlasJson, texture, partsList, atlasId);
+            // get the root display object from the armature
+            this.bonesBase = this.armature.getDisplay();
+	    this.bonesBase.scale.setTo(0.5, 0.5);
+            // position it
+            //this.bonesBase.x = 400;
+            //this.bonesBase.y = 500;
+            // add it to the display list
+            //this.world.add(this.bonesBase);
+            this.sprite.addChild(this.bonesBase);
 	}
 }

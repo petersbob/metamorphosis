@@ -1,4 +1,4 @@
-pconsole.log("Preloader.js being read");
+console.log("Preloader.js being read");
 worldshift.Preloader = function(game) {
 	this.ready = false;
 };
@@ -65,7 +65,6 @@ worldshift.Preloader.prototype = {
 		this.load.image('Platform7-4', 'images/platforms/Platform7-4.png')
 		this.load.image('Platform7-5', 'images/platforms/Platform7-5.png')
 
-		this.load.image('r', 'images/playersprites/r.png');
 		// this.load.image('2ndbg', 'images/backgrounds/2ndbg.png');
 		// this.load.image('3rdbg', 'images/backgrounds/3rdbg.png');
 		// this.load.image('4thbg', 'images/backgrounds/4thbg.png');
@@ -74,6 +73,15 @@ worldshift.Preloader.prototype = {
 		// this.load.image('layer', 'images/backgrounds/layer1stkill.png');
 
 		//------------------------------------//
+
+		//---------dragon stuff------------------//
+		this.load.image('dragon_image', 'dragon_atlas.png');
+	 	this.load.json('dragon_atlas', 'dragon_atlas.json');
+            // load the texture atlas again so that it's content is registered in the atlas frame cache
+        this.load.atlas('atlas1', 'dragon_atlas.png', 'dragon_atlas.json');  
+          // the dragonbones skeleton data
+        this.load.json('dragon', 'dragon_skeleton.json');  
+        //---------------------------------------//
 
 		//this.load.image('platform', 'images/platforms/Platform3-3.png');
 		//---body parts----//
