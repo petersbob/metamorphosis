@@ -140,7 +140,7 @@ worldshift.Game.prototype = {
 
 		if (this.cursors.right.isDown) {
 		    left = true;
-		    this.sprite.body.moveRight(400);
+		    this.sprite.body.moveRight(200);
 		    
 		    if(left && this.armature.animation.getLastAnimationName() != "walk") {
 			this.sprite.scale.x = -1;
@@ -151,7 +151,7 @@ worldshift.Game.prototype = {
 		}
 		else if (this.cursors.left.isDown) {
 		    right = true;
-		    this.sprite.body.moveLeft(400);
+		    this.sprite.body.moveLeft(200);
 		    
 		    if (right && this.armature.animation.getLastAnimationName() != "walk") {
 			this.sprite.scale.x = 1;
@@ -174,17 +174,21 @@ worldshift.Game.prototype = {
 			this.jumping = false;
 		}
 
-/*		if (this.jumps > 0 && this.upInputIsActive(5)) {
-		    this.sprite.body.moveUp(400);
+	    if (this.jumps > 0 && this.upInputIsActive(5)) {
+		this.sprite.body.moveUp(400);
+		/*if ( this.armature.animation.getLastAnimationName() != "jump") {
 		    this.armature.animation.gotoAndPlay("jump", 0);
-			this.jumping = true;
-		}
+		}*/
+		this.jumping = true;
+	    }
 
 	    if (this.jumping && this.upInputIsReleased()) {
-		this.armature.animation.gotoAndPlay("fall");
+		/*if (this.armature.animation.getLastAnimationName() != "fall") {
+		    this.armature.animation.gotoAndPlay("fall");
+		}*/
 			this.jumps--;
 			this.jumping = false;
-		}*/
+		}
 
 	    dragonBones.animation.WorldClock.clock.advanceTime(0.02);
 
@@ -198,7 +202,7 @@ worldshift.Game.prototype = {
 		console.log("Inside addDragonBones");
 	    this.sprite = this.add.sprite(400, 500);
 	    this.physics.p2.enable(this.sprite, true);
-	    this.sprite.body.setCircle(40, 0, 0);
+	    this.sprite.body.setCircle(40, 0, -40);
 	    this.sprite.body.collideWorldBounds = true;
 	    this.sprite.body.kinetic = true;
 	    this.sprite.body.fixedRotation  = true;
