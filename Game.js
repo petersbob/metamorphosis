@@ -28,9 +28,11 @@ worldshift.Game.prototype = {
 
 	create: function() {
 
-	    this.world.setBounds(0, 0, 3750, 3750);
+	    this.world.setBounds(0, 0, 1875, 1875);
 
-		this.add.sprite(0, 0, 'conbg');	// background image
+		this.bg = this.add.sprite(0, 0, 'conbg');	// background image
+        this.bg.scale.setTo(0.5, 0.5);
+        this.bg.alpha = 0.2;
 		this.physics.startSystem(Phaser.Physics.P2JS);
 		this.physics.p2.world.defaultContactMaterial.friction = 0.3;
     	this.physics.p2.world.setGlobalStiffness(1e5);
@@ -68,6 +70,7 @@ worldshift.Game.prototype = {
 
 		//this.sprite.body.clearShapes();
 		//this.sprite.body.loadPolygon('physicsdata', 'r');
+        //this.sprite.scale.setTo(0.5, 0.5);
 
     	this.camera.follow(this.sprite);
 
@@ -84,10 +87,12 @@ worldshift.Game.prototype = {
 				platformarr[i].body.clearShapes();
 				platformarr[i].body.loadPolygon('physicsdata', my_j[i]);
 				platformarr[i].body.static = true;
+                platformarr[i].scale.setTo(0.5, 0.5);
     		}
     	}
 
     	this.plat5_2 = this.add.sprite(400, 3500, 'platform5-2');
+        this.plat5_2.scale.setTo(0.5, 0.5);
 		this.physics.p2.enable(this.plat5_2, true);
 		this.plat5_2.body.clearShapes();
 		this.plat5_2.body.loadPolygon('physicsdata', 'Platform5-2');
@@ -145,7 +150,7 @@ worldshift.Game.prototype = {
 		    if(left && this.armature.animation.getLastAnimationName() != "walk") {
 			this.sprite.scale.x = -1;
 			this.armature.animation.gotoAndPlay("walk", 0);
-			left = true
+			left = true;
 		    }
 
 		}
@@ -174,17 +179,18 @@ worldshift.Game.prototype = {
 			this.jumping = false;
 		}
 
-/*		if (this.jumps > 0 && this.upInputIsActive(5)) {
-		    this.sprite.body.moveUp(400);
-		    this.armature.animation.gotoAndPlay("jump", 0);
-			this.jumping = true;
+		if (this.jumps > 0 && this.upInputIsActive(5)) {
+		 //    this.sprite.body.moveUp(400);
+		 //    this.armature.animation.gotoAndPlay("jump", 0);
+			// this.jumping = true;
+            this.bg.alpha+= 0.01;
 		}
 
 	    if (this.jumping && this.upInputIsReleased()) {
 		this.armature.animation.gotoAndPlay("fall");
-			this.jumps--;
-			this.jumping = false;
-		}*/
+			// this.jumps--;
+			// this.jumping = false;
+		}
 
 	    dragonBones.animation.WorldClock.clock.advanceTime(0.02);
 
@@ -197,7 +203,7 @@ worldshift.Game.prototype = {
 	addDragonBones: function() {
 		console.log("Inside addDragonBones");
 	    this.sprite = this.add.sprite(400, 500);
-	    this.physics.p2.enable(this.sprite, true);
+	    this.physics.p2.enable(this.sprite, false);
 	    this.sprite.body.setCircle(40, 0, 0);
 	    this.sprite.body.collideWorldBounds = true;
 	    this.sprite.body.kinetic = true;

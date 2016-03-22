@@ -12,7 +12,7 @@ worldshift.Boot.prototype = {
 	create: function() {
         this.input.maxPointers = 1;
 		this.stage.disableVisibilityChange = false;
-		this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+		this.scale.scaleMode = Phaser.ScaleManager.NO_SCALE;
 		this.scale.pageAlignHorizontally = true;
 		this.scale.pageAlignVertically = true;
 		this.scale.forceLandscape = true;
