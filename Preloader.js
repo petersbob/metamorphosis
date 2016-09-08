@@ -1,6 +1,6 @@
 console.log("Preloader.js being read");
 worldshift.Preloader = function(game) {
-	this.ready = false;
+    this.ready = false;
 };
 
 var my_j = [];
@@ -114,7 +114,7 @@ worldshift.Preloader.prototype = {
             this.state.start('StartMenu');
 
         }
-	},
+    },
     playBGMusic: function() {
         this.bgmusic.play('', 0, 1, true);
     }
