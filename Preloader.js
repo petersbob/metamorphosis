@@ -30,6 +30,7 @@ worldshift.Preloader.prototype = {
 		this.load.image('platform5-2', 'images/platforms/Platform5-2.png');
 
 		//-----------backgrounds----------//
+
 		this.load.image('conbg', 'images/backgrounds/withoutbackground.png');
 		this.load.image('conbg2', 'images/backgrounds/withgreenbackground.png');
 		this.load.image('startmenubg', 'images/backgrounds/startbg.png');

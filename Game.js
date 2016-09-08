@@ -20,7 +20,7 @@ var rheadclegs = false;	//18 frames
 var cheadrlegs = false;	// 11 frames
 var cheadclegs = false;	// 19 frames
 
-var standing = true;
+var standing = true;		this.load.image('conbg', 'images/backgrounds/withoutbackground.png');
 var left = true;
 var right = false;
 
