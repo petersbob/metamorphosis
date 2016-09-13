@@ -3,18 +3,41 @@ worldshift.Game = function(game) {
 
 };
 
+Bodypart = function(game, x, y, part, a_x, a_y, animation_array) {
+    var new_bodypart = game.sprite.addChild(game.game.make.sprite(x, y, 'sprite_atlas', part));
+    new_bodypart.anchor.set(a_x, a_y);
+    new_bodypart.animations.add('walk', animation_array[0], 5, true);
+    new_bodypart.animations.add('stand', animation_array[1], 5, true);
+    game.sprites_array.push(new_bodypart);
+    return new_bodypart;
+};
+
+Bodypart.prototype = Object.create(Phaser.Sprite.prototype);
+Bodypart.prototype.constructor = Bodypart;
+
 worldshift.Game.prototype = {
 
-	create: function() {
+	  create: function() {
+
+        this.right_gravity = false;
 
 	    this.world.setBounds(0, 0, 1125, 750);
 
 		this.bg = this.add.sprite(0, 0, 'conbg');	// background image
         this.bg.scale.setTo(0.5, 0.5);
-		this.physics.startSystem(Phaser.Physics.P2JS);
-		this.physics.p2.world.defaultContactMaterial.friction = 0.3;
-    	this.physics.p2.world.setGlobalStiffness(1e5);
-    	this.physics.p2.gravity.y = 350;
+		  this.physics.startSystem(Phaser.Physics.P2JS);
+
+    this.physics.p2.setImpactEvents(true);
+
+    this.physics.p2.restitution = 0.4;
+
+    //  Create our collision groups. One for the player, one for the pandas
+    this.playerCollisionGroup = this.physics.p2.createCollisionGroup();
+      this.itemCollisionGroup = this.physics.p2.createCollisionGroup();
+
+      this.physics.p2.updateBoundsCollisionGroup();
+
+    	  this.physics.p2.gravity = [0, 450];
 
       this.sprites_array = [];
     	this.buildsprites();
@@ -27,52 +50,55 @@ worldshift.Game.prototype = {
 	buildsprites: function() {
 		  console.log("Entered buildSprites");
 
+      // the full sprite. will need to move this to an outside function
+
       this.sprite = this.add.sprite(0, 0);
 	    this.physics.p2.enable(this.sprite, true);
-	    this.sprite.body.setCircle(60, 0, 0);
-	    this.sprite.body.collideWorldBounds = true;
-	    this.sprite.body.kinetic = true;
+
+	    this.sprite.body.setCircle(50, 0, 0);
+//	    this.sprite.body.kinetic = true;
 	    this.sprite.body.fixedRotation  = true;
 
-      this.back_leg = this.sprite.addChild(this.game.make.sprite(0, 10, 'sprite_atlas', 'leg01'));
-      this.back_leg.anchor.set(0.5, 0);
-      this.back_leg.animations.add('walk', ['leg01', 'leg02', 'leg01', 'leg03'], 5, true);
-      this.sprites_array.push(this.back_leg);
+      this.sprite.body.setCollisionGroup(this.playerCollisionGroup);
+      this.sprite.body.collides(this.itemCollisionGroup, this.hitItem, this);
 
-      this.back_arm = this.sprite.addChild(this.game.make.sprite(0, -10, 'sprite_atlas', 'arm01'));
-      this.back_arm.anchor.set(0.5, 0);
-      this.back_arm.scale.x = -1 ;
-      this.back_arm.animations.add('walk', ['arm01', 'arm02', 'arm01', 'arm03'], 5, true);
-      this.sprites_array.push(this.back_arm);
+      this.back_leg = new Bodypart(this, 0, 10,'leg01', 0.5, 0, [['leg01', 'leg03', 'leg01', 'leg02'], ['leg01'] ]);
 
-      this.torso = this.sprite.addChild(this.game.make.sprite(0, 0,'sprite_atlas', 'torso'));
-      this.torso.anchor.set(0.5, 0.5);
-      this.sprites_array.push(this.torso);
+      this.back_arm = new Bodypart(this, 0, -10, 'arm01', 0.5, 0, [ ['arm01', 'arm03', 'arm01', 'arm02'], ['arm01']]);
 
-      this.head = this.sprite.addChild(this.game.add.sprite(0, -10, 'sprite_atlas', 'head'));
-      this.head.anchor.set(0.5, 1.0);
-      this.sprites_array.push(this.head);
+      this.torso = new Bodypart(this, 0, 0, 'torso', 0.5, 0.5, [['torso'],['torso']]);
 
-      this.front_leg = this.sprite.addChild(this.game.make.sprite(0, 10, 'sprite_atlas', 'leg01'));
-      this.front_leg.anchor.set(0.5, 0);
-      this.front_leg.animations.add('walk', ['leg01', 'leg02', 'leg01', 'leg03'], 5, true);
-      this.sprites_array.push(this.front_leg);
+      this.head = new Bodypart(this, 0, -10, 'head', 0.5, 1.0,[['head'],['head']]);
 
-      this.front_arm = this.sprite.addChild(this.game.make.sprite(0, -10, 'sprite_atlas', 'arm01'));
-      this.front_arm.anchor.set(0.5, 0);
-      this.front_arm.animations.add('walk', ['arm01', 'arm02', 'arm01', 'arm03'], 5, true);
-      this.sprites_array.push(this.front_arm);
+      this.front_leg = new Bodypart(this, 0, 10,'leg01', 0.5, 0, [['leg01', 'leg02', 'leg01', 'leg03'], ['leg01'] ]);
 
-      // this.sprite.animations.add('stuff');
-      // this.sprite.frame = 8;
+      this.front_arm = new Bodypart(this, 0, -10, 'arm01', 0.5, 0, [ ['arm01', 'arm02', 'arm01', 'arm03'], ['arm01']]);
 
     	this.camera.follow(this.sprite);
 
       this.jumping = false; // if the sprite is jumping
 
     	this.camera.follow(this.sprite);
+      // item
+      this.item = this.game.add.sprite(600, 20, 'sprite_atlas', 'item01');
+      this.item.animations.add('glow', ['item01', 'item02', 'item03', 'item02'], 5, true);
+      this.physics.p2.enable(this.item, false);
+      this.item.body.setCircle(35, 0, 0);
+
+      this.item.body.setCollisionGroup(this.itemCollisionGroup);
+      this.item.body.collides(this.playerCollisionGroup);
+
 
 		//-------------------//
+
+  },
+
+    hitItem: function(body1, body2) {
+        console.log('hit');
+        this.back_leg.animations.add('walk', ['robot_leg01', 'robot_leg03', 'robot_leg01', 'robot_leg02'], 5, true);
+        this.front_leg.animations.add('walk', ['robot_leg01', 'robot_leg02', 'robot_leg01', 'robot_leg03'], 5, true);
+        this.sprite.gravity.y = 0;
+        this.sprite.gravity.x = 450;
 
     },
 
@@ -120,7 +146,12 @@ worldshift.Game.prototype = {
 
 		  if (this.cursors.right.isDown) {
 		      left = true;
-		      this.sprite.body.moveRight(400);
+          if (this.right_gravity) {
+		          this.sprite.body.moveRight(400);
+          }
+          else {
+              this.sprite.body.moveRight(400);
+          }
           this.sprite.scale.x = -1;
           for (var i = 0; i < this.sprites_array.length; i++) {
               if (this.sprites_array[i].animations.getAnimation('walk'))
@@ -129,11 +160,30 @@ worldshift.Game.prototype = {
 		  }
 		  else if (this.cursors.left.isDown) {
 		      right = true;
-		      this.sprite.body.moveLeft(400);
+          if (this.right_gravity) {
+		          this.sprite.body.moveLeft(400);
+          }
+          else {
+              this.sprite.body.moveLeft(400);
+          }
           this.sprite.scale.x = 1;
+          for (var i = 0; i < this.sprites_array.length; i++) {
+              if (this.sprites_array[i].animations.getAnimation('walk'))
+                  this.sprites_array[i].animations.play('walk');
+          }
 		  }
       else{
-		      this.sprite.body.velocity.x = 0;
+          if (this.right_gravity) {
+              this.sprite.body.velocity.y = 0;
+          }
+          else {
+		          this.sprite.body.velocity.x = 0;
+          }
+          for (var i = 0; i < this.sprites_array.length; i++) {
+              if (this.sprites_array[i].animations.getAnimation('stand'))
+                  this.sprites_array[i].animations.play('stand');
+          }
+
       }
 
 	    var onTheGround = this.checkIfCanJump();
@@ -143,7 +193,7 @@ worldshift.Game.prototype = {
 			this.jumping = false;
 		}
 
-		if (this.jumps > 0 && this.upInputIsActive(5)) {
+		  if (this.jumps > 0 && this.upInputIsActive(5)) {
 		    this.sprite.body.moveUp(400);
 			this.jumping = true;
 
@@ -153,7 +203,8 @@ worldshift.Game.prototype = {
 
 			    this.jumps--;
 			    this.jumping = false;
-		}
+		  }
+      this.item.animations.play('glow');
 
 	},
 
