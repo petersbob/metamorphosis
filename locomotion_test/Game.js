@@ -37,7 +37,7 @@ worldshift.Game.prototype = {
 
       this.physics.p2.updateBoundsCollisionGroup();
 
-    	  this.physics.p2.gravity = [0, 450];
+    	this.physics.p2.gravity.y = 450;
 
       this.sprites_array = [];
     	this.buildsprites();
@@ -96,10 +96,9 @@ worldshift.Game.prototype = {
     hitItem: function(body1, body2) {
         console.log('hit');
         this.back_leg.animations.add('walk', ['robot_leg01', 'robot_leg03', 'robot_leg01', 'robot_leg02'], 5, true);
+        this.back_leg.animations.add('stand', ['robot_leg01'], 5, true);
         this.front_leg.animations.add('walk', ['robot_leg01', 'robot_leg02', 'robot_leg01', 'robot_leg03'], 5, true);
-        this.sprite.gravity.y = 0;
-        this.sprite.gravity.x = 450;
-
+        this.front_leg.animations.add('stand', ['robot_leg01'], 5, true);
     },
 
     checkIfCanJump: function() {
