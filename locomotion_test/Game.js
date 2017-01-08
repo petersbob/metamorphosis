@@ -1,3 +1,4 @@
+
 console.log("Game.js is running")
 worldshift.Game = function(game) {
 
@@ -34,7 +35,7 @@ worldshift.Game.prototype = {
     //  Create our collision groups. One for the player, one for the pandas
     this.playerCollisionGroup = this.physics.p2.createCollisionGroup();
       this.itemCollisionGroup = this.physics.p2.createCollisionGroup();
-
+	  }
       this.physics.p2.updateBoundsCollisionGroup();
 
     	this.physics.p2.gravity.y = 450;
